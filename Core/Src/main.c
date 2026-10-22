@@ -63,6 +63,7 @@ static void MX_USART2_UART_Init(void);
  * @brief  The application entry point.
  * @retval int
  */
+#define LED_PIN 5U
 int main(void) {
 
   /* USER CODE BEGIN 1 */
@@ -96,9 +97,8 @@ int main(void) {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-#define LED_PIN 5U
   // enable clock
-  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOA_EN;
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
   GPIOA->MODER &=
       ~(3u << (LED_PIN * 2)); // clears bit 10 and 11 only using bit mask
@@ -115,7 +115,7 @@ int main(void) {
     // enable clock
 
     GPIOA->ODR ^= (1U << LED_PIN);
-    delay(50000);
+    delay(500000);
 
     /* USER CODE BEGIN 3 */
   }
