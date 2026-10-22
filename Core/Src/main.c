@@ -64,6 +64,12 @@ static void MX_USART2_UART_Init(void);
  * @retval int
  */
 #define LED_PIN 5U
+
+static void delay(volatile uint32_t count) {
+  while (count--) {
+  }
+}
+
 int main(void) {
 
   /* USER CODE BEGIN 1 */
@@ -90,34 +96,24 @@ int main(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
 
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  // enable clock
-  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-
-  GPIOA->MODER &=
-      ~(3u << (LED_PIN * 2)); // clears bit 10 and 11 only using bit mask
-  GPIOA->MODER |=
-      (1u << (LED_PIN * 2)); // shifts 1 to bit 10 to change to output
-
-  static void delay(volatile uint32_t count) {
-    while (count--) {
-    }
-  }
-
   while (1) {
     /* USER CODE END WHILE */
-    // enable clock
-
-    GPIOA->ODR ^= (1U << LED_PIN);
-    delay(500000);
 
     /* USER CODE BEGIN 3 */
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
+    uint8_t message[] = "Monitor alive\r\n";
+
+    HAL_StatusTypeDef status =
+        HAL_UART_Transmit(&huart2, message, sizeof(message) - 1U, 100U);
+
+    if (status != HAL_OK) {
+      Error_Handler();
+    }
+
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
