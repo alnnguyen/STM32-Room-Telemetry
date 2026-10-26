@@ -36,12 +36,14 @@
 #define UART_TIMEOUT_MS 100U
 /* USER CODE END PD */
 
-/* Private macro -------------------------------------------------------------*/
+/* Private macro
+   -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
 /* USER CODE END PM */
 
-/* Private variables ---------------------------------------------------------*/
+/* Private variables
+   ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -77,8 +79,11 @@ int main(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init()
 
-  uint32_t counter = 0;
+      /* USER CODE BEGIN 2 */
+      uint32_t counter = 0;
+  /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -89,15 +94,32 @@ int main(void) {
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
+    HAL_StatusTypeDef sensor_status =
+        HAL_I2C_IsDeviceReady(&h12c1, (0x44U << 1), 2U, 100U);
+
     char message[64]; // declared empty message aray 64 bytes wide
 
     // turns the counter into text while respecting the buffer size.
-    int length = snprintf(message, sizeof(message), "Sample %lu\r\n",
-                          (unsigned long)counter);
 
+    // snprintf writes to a destiantion buffer where its pointed to with first
+    // arg, size of is size of buffer, sample is what is written It also returns
+    // total number of characters that would be written or is
+    int length = snprintf(message, sizeof(message),
+                          "Sample %lu: I2C 0x44 %s\r\n", (unsigned long)counter,
+                          sensor_status == HAL_OK ? "ACK" : "no ACK");
+
+    // if lenght is valid, greater than 0 and length is less than the buffer
+    // meaning nothing was truncated, size_t cast is there becasue lenght is
+    // signed and size of is unsignged
     if (length > 0 && (size_t)length < sizeof(message)) {
-      HAL_StatusTypeDef status = HAL_UART_Transmit(&huart2, (uint8_t *)message,
-                                                   (uint16_t)length, 100U);
+      HAL_StatusTypeDef status = HAL_UART_Transmit(
+          &huart2,
+          (uint8_t *)message, // HAL_UART_Transmit, first arg is settings and
+                              // state strcut for usart2 (baud rate, which pins,
+                              // passes pointer, 2nd is pointer to the data)
+          (uint16_t)length,
+          UART_TIMEOUT_MS); // 3rd is how many bytes to send, type cast for
+                            // bytes, give up after 100ms
 
       if (status != HAL_OK) {
         Error_Handler();
