@@ -79,10 +79,11 @@ int main(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_I2C1_Init()
+  MX_I2C1_Init();
 
-      /* USER CODE BEGIN 2 */
-      uint32_t counter = 0;
+  /* USER CODE BEGIN 2 */
+
+  uint32_t counter = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -95,7 +96,7 @@ int main(void) {
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
     HAL_StatusTypeDef sensor_status =
-        HAL_I2C_IsDeviceReady(&h12c1, (0x44U << 1), 2U, 100U);
+        HAL_I2C_IsDeviceReady(&hi2c1, (0x44U << 1), 2U, 100U);
 
     char message[64]; // declared empty message aray 64 bytes wide
 

@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 1
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 1
   28:Core/Src/stm32f4xx_hal_msp.c **** 
   29:Core/Src/stm32f4xx_hal_msp.c **** /* USER CODE END TD */
   30:Core/Src/stm32f4xx_hal_msp.c **** 
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 2
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 2
 
 
   31:Core/Src/stm32f4xx_hal_msp.c **** /* Private define ------------------------------------------------------------*/
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 1
   44 0008 5A6C     		ldr	r2, [r3, #68]
   45 000a 42F48042 		orr	r2, r2, #16384
   46 000e 5A64     		str	r2, [r3, #68]
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 3
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 3
 
 
   47              		.loc 1 69 3 view .LVU4
@@ -165,302 +165,597 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 1
   80 0034 00380240 		.word	1073887232
   81              		.cfi_endproc
   82              	.LFE134:
-  84              		.section	.text.HAL_UART_MspInit,"ax",%progbits
+  84              		.section	.text.HAL_I2C_MspInit,"ax",%progbits
   85              		.align	1
-  86              		.global	HAL_UART_MspInit
+  86              		.global	HAL_I2C_MspInit
   87              		.syntax unified
   88              		.thumb
   89              		.thumb_func
-  91              	HAL_UART_MspInit:
+  91              	HAL_I2C_MspInit:
   92              	.LVL0:
   93              	.LFB135:
   78:Core/Src/stm32f4xx_hal_msp.c **** 
   79:Core/Src/stm32f4xx_hal_msp.c **** /**
-  80:Core/Src/stm32f4xx_hal_msp.c ****   * @brief UART MSP Initialization
+  80:Core/Src/stm32f4xx_hal_msp.c ****   * @brief I2C MSP Initialization
   81:Core/Src/stm32f4xx_hal_msp.c ****   * This function configures the hardware resources used in this example
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 4
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 4
 
 
-  82:Core/Src/stm32f4xx_hal_msp.c ****   * @param huart: UART handle pointer
+  82:Core/Src/stm32f4xx_hal_msp.c ****   * @param hi2c: I2C handle pointer
   83:Core/Src/stm32f4xx_hal_msp.c ****   * @retval None
   84:Core/Src/stm32f4xx_hal_msp.c ****   */
-  85:Core/Src/stm32f4xx_hal_msp.c **** void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+  85:Core/Src/stm32f4xx_hal_msp.c **** void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
   86:Core/Src/stm32f4xx_hal_msp.c **** {
   94              		.loc 1 86 1 is_stmt 1 view -0
   95              		.cfi_startproc
   96              		@ args = 0, pretend = 0, frame = 32
   97              		@ frame_needed = 0, uses_anonymous_args = 0
   98              		.loc 1 86 1 is_stmt 0 view .LVU15
-  99 0000 00B5     		push	{lr}
+  99 0000 30B5     		push	{r4, r5, lr}
  100              	.LCFI2:
- 101              		.cfi_def_cfa_offset 4
- 102              		.cfi_offset 14, -4
- 103 0002 89B0     		sub	sp, sp, #36
- 104              	.LCFI3:
- 105              		.cfi_def_cfa_offset 40
+ 101              		.cfi_def_cfa_offset 12
+ 102              		.cfi_offset 4, -12
+ 103              		.cfi_offset 5, -8
+ 104              		.cfi_offset 14, -4
+ 105 0002 89B0     		sub	sp, sp, #36
+ 106              	.LCFI3:
+ 107              		.cfi_def_cfa_offset 48
   87:Core/Src/stm32f4xx_hal_msp.c ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
- 106              		.loc 1 87 3 is_stmt 1 view .LVU16
- 107              		.loc 1 87 20 is_stmt 0 view .LVU17
- 108 0004 0023     		movs	r3, #0
- 109 0006 0393     		str	r3, [sp, #12]
- 110 0008 0493     		str	r3, [sp, #16]
- 111 000a 0593     		str	r3, [sp, #20]
- 112 000c 0693     		str	r3, [sp, #24]
- 113 000e 0793     		str	r3, [sp, #28]
-  88:Core/Src/stm32f4xx_hal_msp.c ****   if(huart->Instance==USART2)
- 114              		.loc 1 88 3 is_stmt 1 view .LVU18
- 115              		.loc 1 88 11 is_stmt 0 view .LVU19
- 116 0010 0268     		ldr	r2, [r0]
- 117              		.loc 1 88 5 view .LVU20
- 118 0012 134B     		ldr	r3, .L9
- 119 0014 9A42     		cmp	r2, r3
- 120 0016 01D0     		beq	.L8
- 121              	.LVL1:
- 122              	.L5:
+ 108              		.loc 1 87 3 is_stmt 1 view .LVU16
+ 109              		.loc 1 87 20 is_stmt 0 view .LVU17
+ 110 0004 0023     		movs	r3, #0
+ 111 0006 0393     		str	r3, [sp, #12]
+ 112 0008 0493     		str	r3, [sp, #16]
+ 113 000a 0593     		str	r3, [sp, #20]
+ 114 000c 0693     		str	r3, [sp, #24]
+ 115 000e 0793     		str	r3, [sp, #28]
+  88:Core/Src/stm32f4xx_hal_msp.c ****   if(hi2c->Instance==I2C1)
+ 116              		.loc 1 88 3 is_stmt 1 view .LVU18
+ 117              		.loc 1 88 10 is_stmt 0 view .LVU19
+ 118 0010 0268     		ldr	r2, [r0]
+ 119              		.loc 1 88 5 view .LVU20
+ 120 0012 144B     		ldr	r3, .L9
+ 121 0014 9A42     		cmp	r2, r3
+ 122 0016 01D0     		beq	.L8
+ 123              	.LVL1:
+ 124              	.L5:
   89:Core/Src/stm32f4xx_hal_msp.c ****   {
-  90:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspInit 0 */
+  90:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 0 */
   91:Core/Src/stm32f4xx_hal_msp.c **** 
-  92:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspInit 0 */
-  93:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock enable */
-  94:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_USART2_CLK_ENABLE();
-  95:Core/Src/stm32f4xx_hal_msp.c **** 
-  96:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_GPIOA_CLK_ENABLE();
-  97:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
-  98:Core/Src/stm32f4xx_hal_msp.c ****     PA2     ------> USART2_TX
-  99:Core/Src/stm32f4xx_hal_msp.c ****     PA3     ------> USART2_RX
- 100:Core/Src/stm32f4xx_hal_msp.c ****     */
- 101:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
- 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
- 103:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
- 104:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
- 105:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
- 106:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 107:Core/Src/stm32f4xx_hal_msp.c **** 
- 108:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspInit 1 */
+  92:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END I2C1_MspInit 0 */
+  93:Core/Src/stm32f4xx_hal_msp.c **** 
+  94:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_GPIOB_CLK_ENABLE();
+  95:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+  96:Core/Src/stm32f4xx_hal_msp.c ****     PB6     ------> I2C1_SCL
+  97:Core/Src/stm32f4xx_hal_msp.c ****     PB7     ------> I2C1_SDA
+  98:Core/Src/stm32f4xx_hal_msp.c ****     */
+  99:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+ 100:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+ 101:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+ 103:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+ 104:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 105:Core/Src/stm32f4xx_hal_msp.c **** 
+ 106:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock enable */
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_I2C1_CLK_ENABLE();
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 5
+
+
+ 108:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
  109:Core/Src/stm32f4xx_hal_msp.c **** 
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 5
-
-
- 110:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspInit 1 */
+ 110:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END I2C1_MspInit 1 */
  111:Core/Src/stm32f4xx_hal_msp.c **** 
  112:Core/Src/stm32f4xx_hal_msp.c ****   }
  113:Core/Src/stm32f4xx_hal_msp.c **** 
  114:Core/Src/stm32f4xx_hal_msp.c **** }
- 123              		.loc 1 114 1 view .LVU21
- 124 0018 09B0     		add	sp, sp, #36
- 125              	.LCFI4:
- 126              		.cfi_remember_state
- 127              		.cfi_def_cfa_offset 4
- 128              		@ sp needed
- 129 001a 00BD     		pop	{pc}
- 130              	.LVL2:
- 131              	.L8:
- 132              	.LCFI5:
- 133              		.cfi_restore_state
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 134              		.loc 1 94 5 is_stmt 1 view .LVU22
- 135              	.LBB4:
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 136              		.loc 1 94 5 view .LVU23
- 137 001c 0021     		movs	r1, #0
- 138 001e 0191     		str	r1, [sp, #4]
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 139              		.loc 1 94 5 view .LVU24
- 140 0020 03F5FA33 		add	r3, r3, #128000
- 141 0024 1A6C     		ldr	r2, [r3, #64]
- 142 0026 42F40032 		orr	r2, r2, #131072
- 143 002a 1A64     		str	r2, [r3, #64]
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 144              		.loc 1 94 5 view .LVU25
- 145 002c 1A6C     		ldr	r2, [r3, #64]
- 146 002e 02F40032 		and	r2, r2, #131072
- 147 0032 0192     		str	r2, [sp, #4]
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 148              		.loc 1 94 5 view .LVU26
- 149 0034 019A     		ldr	r2, [sp, #4]
- 150              	.LBE4:
-  94:Core/Src/stm32f4xx_hal_msp.c **** 
- 151              		.loc 1 94 5 view .LVU27
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 152              		.loc 1 96 5 view .LVU28
- 153              	.LBB5:
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 154              		.loc 1 96 5 view .LVU29
- 155 0036 0291     		str	r1, [sp, #8]
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 156              		.loc 1 96 5 view .LVU30
- 157 0038 1A6B     		ldr	r2, [r3, #48]
- 158 003a 42F00102 		orr	r2, r2, #1
- 159 003e 1A63     		str	r2, [r3, #48]
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 160              		.loc 1 96 5 view .LVU31
- 161 0040 1B6B     		ldr	r3, [r3, #48]
- 162 0042 03F00103 		and	r3, r3, #1
- 163 0046 0293     		str	r3, [sp, #8]
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 6
+ 125              		.loc 1 114 1 view .LVU21
+ 126 0018 09B0     		add	sp, sp, #36
+ 127              	.LCFI4:
+ 128              		.cfi_remember_state
+ 129              		.cfi_def_cfa_offset 12
+ 130              		@ sp needed
+ 131 001a 30BD     		pop	{r4, r5, pc}
+ 132              	.LVL2:
+ 133              	.L8:
+ 134              	.LCFI5:
+ 135              		.cfi_restore_state
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 136              		.loc 1 94 5 is_stmt 1 view .LVU22
+ 137              	.LBB4:
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 138              		.loc 1 94 5 view .LVU23
+ 139 001c 0025     		movs	r5, #0
+ 140 001e 0195     		str	r5, [sp, #4]
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 141              		.loc 1 94 5 view .LVU24
+ 142 0020 114C     		ldr	r4, .L9+4
+ 143 0022 236B     		ldr	r3, [r4, #48]
+ 144 0024 43F00203 		orr	r3, r3, #2
+ 145 0028 2363     		str	r3, [r4, #48]
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 146              		.loc 1 94 5 view .LVU25
+ 147 002a 236B     		ldr	r3, [r4, #48]
+ 148 002c 03F00203 		and	r3, r3, #2
+ 149 0030 0193     		str	r3, [sp, #4]
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 150              		.loc 1 94 5 view .LVU26
+ 151 0032 019B     		ldr	r3, [sp, #4]
+ 152              	.LBE4:
+  94:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 153              		.loc 1 94 5 view .LVU27
+  99:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+ 154              		.loc 1 99 5 view .LVU28
+  99:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+ 155              		.loc 1 99 25 is_stmt 0 view .LVU29
+ 156 0034 C023     		movs	r3, #192
+ 157 0036 0393     		str	r3, [sp, #12]
+ 100:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 158              		.loc 1 100 5 is_stmt 1 view .LVU30
+ 100:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 159              		.loc 1 100 26 is_stmt 0 view .LVU31
+ 160 0038 1223     		movs	r3, #18
+ 161 003a 0493     		str	r3, [sp, #16]
+ 101:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+ 162              		.loc 1 101 5 is_stmt 1 view .LVU32
+ 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 6
 
 
- 164              		.loc 1 96 5 view .LVU32
- 165 0048 029B     		ldr	r3, [sp, #8]
- 166              	.LBE5:
-  96:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 167              		.loc 1 96 5 view .LVU33
- 101:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
- 168              		.loc 1 101 5 view .LVU34
- 101:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
- 169              		.loc 1 101 25 is_stmt 0 view .LVU35
- 170 004a 0C23     		movs	r3, #12
- 171 004c 0393     		str	r3, [sp, #12]
- 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
- 172              		.loc 1 102 5 is_stmt 1 view .LVU36
- 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
- 173              		.loc 1 102 26 is_stmt 0 view .LVU37
- 174 004e 0223     		movs	r3, #2
- 175 0050 0493     		str	r3, [sp, #16]
- 103:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
- 176              		.loc 1 103 5 is_stmt 1 view .LVU38
- 104:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
- 177              		.loc 1 104 5 view .LVU39
- 105:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 178              		.loc 1 105 5 view .LVU40
- 105:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 179              		.loc 1 105 31 is_stmt 0 view .LVU41
- 180 0052 0723     		movs	r3, #7
- 181 0054 0793     		str	r3, [sp, #28]
- 106:Core/Src/stm32f4xx_hal_msp.c **** 
- 182              		.loc 1 106 5 is_stmt 1 view .LVU42
- 183 0056 03A9     		add	r1, sp, #12
- 184 0058 0248     		ldr	r0, .L9+4
- 185              	.LVL3:
- 106:Core/Src/stm32f4xx_hal_msp.c **** 
- 186              		.loc 1 106 5 is_stmt 0 view .LVU43
- 187 005a FFF7FEFF 		bl	HAL_GPIO_Init
- 188              	.LVL4:
- 189              		.loc 1 114 1 view .LVU44
- 190 005e DBE7     		b	.L5
- 191              	.L10:
- 192              		.align	2
- 193              	.L9:
- 194 0060 00440040 		.word	1073759232
- 195 0064 00000240 		.word	1073872896
- 196              		.cfi_endproc
- 197              	.LFE135:
- 199              		.section	.text.HAL_UART_MspDeInit,"ax",%progbits
- 200              		.align	1
- 201              		.global	HAL_UART_MspDeInit
- 202              		.syntax unified
- 203              		.thumb
- 204              		.thumb_func
- 206              	HAL_UART_MspDeInit:
- 207              	.LVL5:
- 208              	.LFB136:
+ 163              		.loc 1 102 5 view .LVU33
+ 102:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+ 164              		.loc 1 102 27 is_stmt 0 view .LVU34
+ 165 003c 0323     		movs	r3, #3
+ 166 003e 0693     		str	r3, [sp, #24]
+ 103:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 167              		.loc 1 103 5 is_stmt 1 view .LVU35
+ 103:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 168              		.loc 1 103 31 is_stmt 0 view .LVU36
+ 169 0040 0423     		movs	r3, #4
+ 170 0042 0793     		str	r3, [sp, #28]
+ 104:Core/Src/stm32f4xx_hal_msp.c **** 
+ 171              		.loc 1 104 5 is_stmt 1 view .LVU37
+ 172 0044 03A9     		add	r1, sp, #12
+ 173 0046 0948     		ldr	r0, .L9+8
+ 174              	.LVL3:
+ 104:Core/Src/stm32f4xx_hal_msp.c **** 
+ 175              		.loc 1 104 5 is_stmt 0 view .LVU38
+ 176 0048 FFF7FEFF 		bl	HAL_GPIO_Init
+ 177              	.LVL4:
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 178              		.loc 1 107 5 is_stmt 1 view .LVU39
+ 179              	.LBB5:
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 180              		.loc 1 107 5 view .LVU40
+ 181 004c 0295     		str	r5, [sp, #8]
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 182              		.loc 1 107 5 view .LVU41
+ 183 004e 236C     		ldr	r3, [r4, #64]
+ 184 0050 43F40013 		orr	r3, r3, #2097152
+ 185 0054 2364     		str	r3, [r4, #64]
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 186              		.loc 1 107 5 view .LVU42
+ 187 0056 236C     		ldr	r3, [r4, #64]
+ 188 0058 03F40013 		and	r3, r3, #2097152
+ 189 005c 0293     		str	r3, [sp, #8]
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 190              		.loc 1 107 5 view .LVU43
+ 191 005e 029B     		ldr	r3, [sp, #8]
+ 192              	.LBE5:
+ 107:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspInit 1 */
+ 193              		.loc 1 107 5 view .LVU44
+ 194              		.loc 1 114 1 is_stmt 0 view .LVU45
+ 195 0060 DAE7     		b	.L5
+ 196              	.L10:
+ 197 0062 00BF     		.align	2
+ 198              	.L9:
+ 199 0064 00540040 		.word	1073763328
+ 200 0068 00380240 		.word	1073887232
+ 201 006c 00040240 		.word	1073873920
+ 202              		.cfi_endproc
+ 203              	.LFE135:
+ 205              		.section	.text.HAL_I2C_MspDeInit,"ax",%progbits
+ 206              		.align	1
+ 207              		.global	HAL_I2C_MspDeInit
+ 208              		.syntax unified
+ 209              		.thumb
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 7
+
+
+ 210              		.thumb_func
+ 212              	HAL_I2C_MspDeInit:
+ 213              	.LVL5:
+ 214              	.LFB136:
  115:Core/Src/stm32f4xx_hal_msp.c **** 
  116:Core/Src/stm32f4xx_hal_msp.c **** /**
- 117:Core/Src/stm32f4xx_hal_msp.c ****   * @brief UART MSP De-Initialization
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 7
-
-
+ 117:Core/Src/stm32f4xx_hal_msp.c ****   * @brief I2C MSP De-Initialization
  118:Core/Src/stm32f4xx_hal_msp.c ****   * This function freeze the hardware resources used in this example
- 119:Core/Src/stm32f4xx_hal_msp.c ****   * @param huart: UART handle pointer
+ 119:Core/Src/stm32f4xx_hal_msp.c ****   * @param hi2c: I2C handle pointer
  120:Core/Src/stm32f4xx_hal_msp.c ****   * @retval None
  121:Core/Src/stm32f4xx_hal_msp.c ****   */
- 122:Core/Src/stm32f4xx_hal_msp.c **** void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+ 122:Core/Src/stm32f4xx_hal_msp.c **** void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
  123:Core/Src/stm32f4xx_hal_msp.c **** {
- 209              		.loc 1 123 1 is_stmt 1 view -0
- 210              		.cfi_startproc
- 211              		@ args = 0, pretend = 0, frame = 0
- 212              		@ frame_needed = 0, uses_anonymous_args = 0
- 213              		.loc 1 123 1 is_stmt 0 view .LVU46
- 214 0000 08B5     		push	{r3, lr}
- 215              	.LCFI6:
- 216              		.cfi_def_cfa_offset 8
- 217              		.cfi_offset 3, -8
- 218              		.cfi_offset 14, -4
- 124:Core/Src/stm32f4xx_hal_msp.c ****   if(huart->Instance==USART2)
- 219              		.loc 1 124 3 is_stmt 1 view .LVU47
- 220              		.loc 1 124 11 is_stmt 0 view .LVU48
- 221 0002 0268     		ldr	r2, [r0]
- 222              		.loc 1 124 5 view .LVU49
- 223 0004 064B     		ldr	r3, .L15
- 224 0006 9A42     		cmp	r2, r3
- 225 0008 00D0     		beq	.L14
- 226              	.LVL6:
- 227              	.L11:
+ 215              		.loc 1 123 1 is_stmt 1 view -0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 0
+ 218              		@ frame_needed = 0, uses_anonymous_args = 0
+ 219              		.loc 1 123 1 is_stmt 0 view .LVU47
+ 220 0000 08B5     		push	{r3, lr}
+ 221              	.LCFI6:
+ 222              		.cfi_def_cfa_offset 8
+ 223              		.cfi_offset 3, -8
+ 224              		.cfi_offset 14, -4
+ 124:Core/Src/stm32f4xx_hal_msp.c ****   if(hi2c->Instance==I2C1)
+ 225              		.loc 1 124 3 is_stmt 1 view .LVU48
+ 226              		.loc 1 124 10 is_stmt 0 view .LVU49
+ 227 0002 0268     		ldr	r2, [r0]
+ 228              		.loc 1 124 5 view .LVU50
+ 229 0004 084B     		ldr	r3, .L15
+ 230 0006 9A42     		cmp	r2, r3
+ 231 0008 00D0     		beq	.L14
+ 232              	.LVL6:
+ 233              	.L11:
  125:Core/Src/stm32f4xx_hal_msp.c ****   {
- 126:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspDeInit 0 */
+ 126:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspDeInit 0 */
  127:Core/Src/stm32f4xx_hal_msp.c **** 
- 128:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspDeInit 0 */
+ 128:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END I2C1_MspDeInit 0 */
  129:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock disable */
- 130:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_USART2_CLK_DISABLE();
+ 130:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_I2C1_CLK_DISABLE();
  131:Core/Src/stm32f4xx_hal_msp.c **** 
- 132:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
- 133:Core/Src/stm32f4xx_hal_msp.c ****     PA2     ------> USART2_TX
- 134:Core/Src/stm32f4xx_hal_msp.c ****     PA3     ------> USART2_RX
+ 132:Core/Src/stm32f4xx_hal_msp.c ****     /**I2C1 GPIO Configuration
+ 133:Core/Src/stm32f4xx_hal_msp.c ****     PB6     ------> I2C1_SCL
+ 134:Core/Src/stm32f4xx_hal_msp.c ****     PB7     ------> I2C1_SDA
  135:Core/Src/stm32f4xx_hal_msp.c ****     */
- 136:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_DeInit(GPIOA, USART_TX_Pin|USART_RX_Pin);
+ 136:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6);
  137:Core/Src/stm32f4xx_hal_msp.c **** 
- 138:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspDeInit 1 */
+ 138:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_7);
  139:Core/Src/stm32f4xx_hal_msp.c **** 
- 140:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspDeInit 1 */
- 141:Core/Src/stm32f4xx_hal_msp.c ****   }
- 142:Core/Src/stm32f4xx_hal_msp.c **** 
- 143:Core/Src/stm32f4xx_hal_msp.c **** }
- 228              		.loc 1 143 1 view .LVU50
- 229 000a 08BD     		pop	{r3, pc}
- 230              	.LVL7:
- 231              	.L14:
+ 140:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN I2C1_MspDeInit 1 */
+ 141:Core/Src/stm32f4xx_hal_msp.c **** 
+ 142:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END I2C1_MspDeInit 1 */
+ 143:Core/Src/stm32f4xx_hal_msp.c ****   }
+ 144:Core/Src/stm32f4xx_hal_msp.c **** 
+ 145:Core/Src/stm32f4xx_hal_msp.c **** }
+ 234              		.loc 1 145 1 view .LVU51
+ 235 000a 08BD     		pop	{r3, pc}
+ 236              	.LVL7:
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 8
+
+
+ 237              	.L14:
  130:Core/Src/stm32f4xx_hal_msp.c **** 
- 232              		.loc 1 130 5 is_stmt 1 view .LVU51
- 233 000c 054A     		ldr	r2, .L15+4
- 234 000e 136C     		ldr	r3, [r2, #64]
- 235 0010 23F40033 		bic	r3, r3, #131072
- 236 0014 1364     		str	r3, [r2, #64]
+ 238              		.loc 1 130 5 is_stmt 1 view .LVU52
+ 239 000c 074A     		ldr	r2, .L15+4
+ 240 000e 136C     		ldr	r3, [r2, #64]
+ 241 0010 23F40013 		bic	r3, r3, #2097152
+ 242 0014 1364     		str	r3, [r2, #64]
  136:Core/Src/stm32f4xx_hal_msp.c **** 
- 237              		.loc 1 136 5 view .LVU52
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 8
+ 243              		.loc 1 136 5 view .LVU53
+ 244 0016 4021     		movs	r1, #64
+ 245 0018 0548     		ldr	r0, .L15+8
+ 246              	.LVL8:
+ 136:Core/Src/stm32f4xx_hal_msp.c **** 
+ 247              		.loc 1 136 5 is_stmt 0 view .LVU54
+ 248 001a FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 249              	.LVL9:
+ 138:Core/Src/stm32f4xx_hal_msp.c **** 
+ 250              		.loc 1 138 5 is_stmt 1 view .LVU55
+ 251 001e 8021     		movs	r1, #128
+ 252 0020 0348     		ldr	r0, .L15+8
+ 253 0022 FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 254              	.LVL10:
+ 255              		.loc 1 145 1 is_stmt 0 view .LVU56
+ 256 0026 F0E7     		b	.L11
+ 257              	.L16:
+ 258              		.align	2
+ 259              	.L15:
+ 260 0028 00540040 		.word	1073763328
+ 261 002c 00380240 		.word	1073887232
+ 262 0030 00040240 		.word	1073873920
+ 263              		.cfi_endproc
+ 264              	.LFE136:
+ 266              		.section	.text.HAL_UART_MspInit,"ax",%progbits
+ 267              		.align	1
+ 268              		.global	HAL_UART_MspInit
+ 269              		.syntax unified
+ 270              		.thumb
+ 271              		.thumb_func
+ 273              	HAL_UART_MspInit:
+ 274              	.LVL11:
+ 275              	.LFB137:
+ 146:Core/Src/stm32f4xx_hal_msp.c **** 
+ 147:Core/Src/stm32f4xx_hal_msp.c **** /**
+ 148:Core/Src/stm32f4xx_hal_msp.c ****   * @brief UART MSP Initialization
+ 149:Core/Src/stm32f4xx_hal_msp.c ****   * This function configures the hardware resources used in this example
+ 150:Core/Src/stm32f4xx_hal_msp.c ****   * @param huart: UART handle pointer
+ 151:Core/Src/stm32f4xx_hal_msp.c ****   * @retval None
+ 152:Core/Src/stm32f4xx_hal_msp.c ****   */
+ 153:Core/Src/stm32f4xx_hal_msp.c **** void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+ 154:Core/Src/stm32f4xx_hal_msp.c **** {
+ 276              		.loc 1 154 1 is_stmt 1 view -0
+ 277              		.cfi_startproc
+ 278              		@ args = 0, pretend = 0, frame = 32
+ 279              		@ frame_needed = 0, uses_anonymous_args = 0
+ 280              		.loc 1 154 1 is_stmt 0 view .LVU58
+ 281 0000 00B5     		push	{lr}
+ 282              	.LCFI7:
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 9
 
 
- 238 0016 0C21     		movs	r1, #12
- 239 0018 0348     		ldr	r0, .L15+8
- 240              	.LVL8:
- 136:Core/Src/stm32f4xx_hal_msp.c **** 
- 241              		.loc 1 136 5 is_stmt 0 view .LVU53
- 242 001a FFF7FEFF 		bl	HAL_GPIO_DeInit
- 243              	.LVL9:
- 244              		.loc 1 143 1 view .LVU54
- 245 001e F4E7     		b	.L11
- 246              	.L16:
- 247              		.align	2
- 248              	.L15:
- 249 0020 00440040 		.word	1073759232
- 250 0024 00380240 		.word	1073887232
- 251 0028 00000240 		.word	1073872896
- 252              		.cfi_endproc
- 253              	.LFE136:
- 255              		.text
- 256              	.Letext0:
- 257              		.file 2 "/Applications/ArmGNUToolchain/15.3.rel2/arm-none-eabi/arm-none-eabi/include/machine/_defa
- 258              		.file 3 "/Applications/ArmGNUToolchain/15.3.rel2/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
- 259              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h"
- 260              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
- 261              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
- 262              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
- 263              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s 			page 9
+ 283              		.cfi_def_cfa_offset 4
+ 284              		.cfi_offset 14, -4
+ 285 0002 89B0     		sub	sp, sp, #36
+ 286              	.LCFI8:
+ 287              		.cfi_def_cfa_offset 40
+ 155:Core/Src/stm32f4xx_hal_msp.c ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 288              		.loc 1 155 3 is_stmt 1 view .LVU59
+ 289              		.loc 1 155 20 is_stmt 0 view .LVU60
+ 290 0004 0023     		movs	r3, #0
+ 291 0006 0393     		str	r3, [sp, #12]
+ 292 0008 0493     		str	r3, [sp, #16]
+ 293 000a 0593     		str	r3, [sp, #20]
+ 294 000c 0693     		str	r3, [sp, #24]
+ 295 000e 0793     		str	r3, [sp, #28]
+ 156:Core/Src/stm32f4xx_hal_msp.c ****   if(huart->Instance==USART2)
+ 296              		.loc 1 156 3 is_stmt 1 view .LVU61
+ 297              		.loc 1 156 11 is_stmt 0 view .LVU62
+ 298 0010 0268     		ldr	r2, [r0]
+ 299              		.loc 1 156 5 view .LVU63
+ 300 0012 134B     		ldr	r3, .L21
+ 301 0014 9A42     		cmp	r2, r3
+ 302 0016 01D0     		beq	.L20
+ 303              	.LVL12:
+ 304              	.L17:
+ 157:Core/Src/stm32f4xx_hal_msp.c ****   {
+ 158:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspInit 0 */
+ 159:Core/Src/stm32f4xx_hal_msp.c **** 
+ 160:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspInit 0 */
+ 161:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock enable */
+ 162:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_USART2_CLK_ENABLE();
+ 163:Core/Src/stm32f4xx_hal_msp.c **** 
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_GPIOA_CLK_ENABLE();
+ 165:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 166:Core/Src/stm32f4xx_hal_msp.c ****     PA2     ------> USART2_TX
+ 167:Core/Src/stm32f4xx_hal_msp.c ****     PA3     ------> USART2_RX
+ 168:Core/Src/stm32f4xx_hal_msp.c ****     */
+ 169:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
+ 170:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 171:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 172:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 173:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+ 174:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 175:Core/Src/stm32f4xx_hal_msp.c **** 
+ 176:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspInit 1 */
+ 177:Core/Src/stm32f4xx_hal_msp.c **** 
+ 178:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspInit 1 */
+ 179:Core/Src/stm32f4xx_hal_msp.c **** 
+ 180:Core/Src/stm32f4xx_hal_msp.c ****   }
+ 181:Core/Src/stm32f4xx_hal_msp.c **** 
+ 182:Core/Src/stm32f4xx_hal_msp.c **** }
+ 305              		.loc 1 182 1 view .LVU64
+ 306 0018 09B0     		add	sp, sp, #36
+ 307              	.LCFI9:
+ 308              		.cfi_remember_state
+ 309              		.cfi_def_cfa_offset 4
+ 310              		@ sp needed
+ 311 001a 00BD     		pop	{pc}
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 10
+
+
+ 312              	.LVL13:
+ 313              	.L20:
+ 314              	.LCFI10:
+ 315              		.cfi_restore_state
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 316              		.loc 1 162 5 is_stmt 1 view .LVU65
+ 317              	.LBB6:
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 318              		.loc 1 162 5 view .LVU66
+ 319 001c 0021     		movs	r1, #0
+ 320 001e 0191     		str	r1, [sp, #4]
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 321              		.loc 1 162 5 view .LVU67
+ 322 0020 03F5FA33 		add	r3, r3, #128000
+ 323 0024 1A6C     		ldr	r2, [r3, #64]
+ 324 0026 42F40032 		orr	r2, r2, #131072
+ 325 002a 1A64     		str	r2, [r3, #64]
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 326              		.loc 1 162 5 view .LVU68
+ 327 002c 1A6C     		ldr	r2, [r3, #64]
+ 328 002e 02F40032 		and	r2, r2, #131072
+ 329 0032 0192     		str	r2, [sp, #4]
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 330              		.loc 1 162 5 view .LVU69
+ 331 0034 019A     		ldr	r2, [sp, #4]
+ 332              	.LBE6:
+ 162:Core/Src/stm32f4xx_hal_msp.c **** 
+ 333              		.loc 1 162 5 view .LVU70
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 334              		.loc 1 164 5 view .LVU71
+ 335              	.LBB7:
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 336              		.loc 1 164 5 view .LVU72
+ 337 0036 0291     		str	r1, [sp, #8]
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 338              		.loc 1 164 5 view .LVU73
+ 339 0038 1A6B     		ldr	r2, [r3, #48]
+ 340 003a 42F00102 		orr	r2, r2, #1
+ 341 003e 1A63     		str	r2, [r3, #48]
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 342              		.loc 1 164 5 view .LVU74
+ 343 0040 1B6B     		ldr	r3, [r3, #48]
+ 344 0042 03F00103 		and	r3, r3, #1
+ 345 0046 0293     		str	r3, [sp, #8]
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 346              		.loc 1 164 5 view .LVU75
+ 347 0048 029B     		ldr	r3, [sp, #8]
+ 348              	.LBE7:
+ 164:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 349              		.loc 1 164 5 view .LVU76
+ 169:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 350              		.loc 1 169 5 view .LVU77
+ 169:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 351              		.loc 1 169 25 is_stmt 0 view .LVU78
+ 352 004a 0C23     		movs	r3, #12
+ 353 004c 0393     		str	r3, [sp, #12]
+ 170:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 11
+
+
+ 354              		.loc 1 170 5 is_stmt 1 view .LVU79
+ 170:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 355              		.loc 1 170 26 is_stmt 0 view .LVU80
+ 356 004e 0223     		movs	r3, #2
+ 357 0050 0493     		str	r3, [sp, #16]
+ 171:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 358              		.loc 1 171 5 is_stmt 1 view .LVU81
+ 172:Core/Src/stm32f4xx_hal_msp.c ****     GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+ 359              		.loc 1 172 5 view .LVU82
+ 173:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 360              		.loc 1 173 5 view .LVU83
+ 173:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 361              		.loc 1 173 31 is_stmt 0 view .LVU84
+ 362 0052 0723     		movs	r3, #7
+ 363 0054 0793     		str	r3, [sp, #28]
+ 174:Core/Src/stm32f4xx_hal_msp.c **** 
+ 364              		.loc 1 174 5 is_stmt 1 view .LVU85
+ 365 0056 03A9     		add	r1, sp, #12
+ 366 0058 0248     		ldr	r0, .L21+4
+ 367              	.LVL14:
+ 174:Core/Src/stm32f4xx_hal_msp.c **** 
+ 368              		.loc 1 174 5 is_stmt 0 view .LVU86
+ 369 005a FFF7FEFF 		bl	HAL_GPIO_Init
+ 370              	.LVL15:
+ 371              		.loc 1 182 1 view .LVU87
+ 372 005e DBE7     		b	.L17
+ 373              	.L22:
+ 374              		.align	2
+ 375              	.L21:
+ 376 0060 00440040 		.word	1073759232
+ 377 0064 00000240 		.word	1073872896
+ 378              		.cfi_endproc
+ 379              	.LFE137:
+ 381              		.section	.text.HAL_UART_MspDeInit,"ax",%progbits
+ 382              		.align	1
+ 383              		.global	HAL_UART_MspDeInit
+ 384              		.syntax unified
+ 385              		.thumb
+ 386              		.thumb_func
+ 388              	HAL_UART_MspDeInit:
+ 389              	.LVL16:
+ 390              	.LFB138:
+ 183:Core/Src/stm32f4xx_hal_msp.c **** 
+ 184:Core/Src/stm32f4xx_hal_msp.c **** /**
+ 185:Core/Src/stm32f4xx_hal_msp.c ****   * @brief UART MSP De-Initialization
+ 186:Core/Src/stm32f4xx_hal_msp.c ****   * This function freeze the hardware resources used in this example
+ 187:Core/Src/stm32f4xx_hal_msp.c ****   * @param huart: UART handle pointer
+ 188:Core/Src/stm32f4xx_hal_msp.c ****   * @retval None
+ 189:Core/Src/stm32f4xx_hal_msp.c ****   */
+ 190:Core/Src/stm32f4xx_hal_msp.c **** void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+ 191:Core/Src/stm32f4xx_hal_msp.c **** {
+ 391              		.loc 1 191 1 is_stmt 1 view -0
+ 392              		.cfi_startproc
+ 393              		@ args = 0, pretend = 0, frame = 0
+ 394              		@ frame_needed = 0, uses_anonymous_args = 0
+ 395              		.loc 1 191 1 is_stmt 0 view .LVU89
+ 396 0000 08B5     		push	{r3, lr}
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 12
+
+
+ 397              	.LCFI11:
+ 398              		.cfi_def_cfa_offset 8
+ 399              		.cfi_offset 3, -8
+ 400              		.cfi_offset 14, -4
+ 192:Core/Src/stm32f4xx_hal_msp.c ****   if(huart->Instance==USART2)
+ 401              		.loc 1 192 3 is_stmt 1 view .LVU90
+ 402              		.loc 1 192 11 is_stmt 0 view .LVU91
+ 403 0002 0268     		ldr	r2, [r0]
+ 404              		.loc 1 192 5 view .LVU92
+ 405 0004 064B     		ldr	r3, .L27
+ 406 0006 9A42     		cmp	r2, r3
+ 407 0008 00D0     		beq	.L26
+ 408              	.LVL17:
+ 409              	.L23:
+ 193:Core/Src/stm32f4xx_hal_msp.c ****   {
+ 194:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspDeInit 0 */
+ 195:Core/Src/stm32f4xx_hal_msp.c **** 
+ 196:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspDeInit 0 */
+ 197:Core/Src/stm32f4xx_hal_msp.c ****     /* Peripheral clock disable */
+ 198:Core/Src/stm32f4xx_hal_msp.c ****     __HAL_RCC_USART2_CLK_DISABLE();
+ 199:Core/Src/stm32f4xx_hal_msp.c **** 
+ 200:Core/Src/stm32f4xx_hal_msp.c ****     /**USART2 GPIO Configuration
+ 201:Core/Src/stm32f4xx_hal_msp.c ****     PA2     ------> USART2_TX
+ 202:Core/Src/stm32f4xx_hal_msp.c ****     PA3     ------> USART2_RX
+ 203:Core/Src/stm32f4xx_hal_msp.c ****     */
+ 204:Core/Src/stm32f4xx_hal_msp.c ****     HAL_GPIO_DeInit(GPIOA, USART_TX_Pin|USART_RX_Pin);
+ 205:Core/Src/stm32f4xx_hal_msp.c **** 
+ 206:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE BEGIN USART2_MspDeInit 1 */
+ 207:Core/Src/stm32f4xx_hal_msp.c **** 
+ 208:Core/Src/stm32f4xx_hal_msp.c ****     /* USER CODE END USART2_MspDeInit 1 */
+ 209:Core/Src/stm32f4xx_hal_msp.c ****   }
+ 210:Core/Src/stm32f4xx_hal_msp.c **** 
+ 211:Core/Src/stm32f4xx_hal_msp.c **** }
+ 410              		.loc 1 211 1 view .LVU93
+ 411 000a 08BD     		pop	{r3, pc}
+ 412              	.LVL18:
+ 413              	.L26:
+ 198:Core/Src/stm32f4xx_hal_msp.c **** 
+ 414              		.loc 1 198 5 is_stmt 1 view .LVU94
+ 415 000c 054A     		ldr	r2, .L27+4
+ 416 000e 136C     		ldr	r3, [r2, #64]
+ 417 0010 23F40033 		bic	r3, r3, #131072
+ 418 0014 1364     		str	r3, [r2, #64]
+ 204:Core/Src/stm32f4xx_hal_msp.c **** 
+ 419              		.loc 1 204 5 view .LVU95
+ 420 0016 0C21     		movs	r1, #12
+ 421 0018 0348     		ldr	r0, .L27+8
+ 422              	.LVL19:
+ 204:Core/Src/stm32f4xx_hal_msp.c **** 
+ 423              		.loc 1 204 5 is_stmt 0 view .LVU96
+ 424 001a FFF7FEFF 		bl	HAL_GPIO_DeInit
+ 425              	.LVL20:
+ 426              		.loc 1 211 1 view .LVU97
+ 427 001e F4E7     		b	.L23
+ 428              	.L28:
+ 429              		.align	2
+ 430              	.L27:
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 13
+
+
+ 431 0020 00440040 		.word	1073759232
+ 432 0024 00380240 		.word	1073887232
+ 433 0028 00000240 		.word	1073872896
+ 434              		.cfi_endproc
+ 435              	.LFE138:
+ 437              		.text
+ 438              	.Letext0:
+ 439              		.file 2 "/Applications/ArmGNUToolchain/15.3.rel2/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 440              		.file 3 "/Applications/ArmGNUToolchain/15.3.rel2/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 441              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f401xe.h"
+ 442              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 443              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 444              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 445              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h"
+ 446              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s 			page 14
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_hal_msp.c
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:21     .text.HAL_MspInit:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:27     .text.HAL_MspInit:00000000 HAL_MspInit
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:80     .text.HAL_MspInit:00000034 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:85     .text.HAL_UART_MspInit:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:91     .text.HAL_UART_MspInit:00000000 HAL_UART_MspInit
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:194    .text.HAL_UART_MspInit:00000060 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:200    .text.HAL_UART_MspDeInit:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:206    .text.HAL_UART_MspDeInit:00000000 HAL_UART_MspDeInit
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc9KpjRX.s:249    .text.HAL_UART_MspDeInit:00000020 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:21     .text.HAL_MspInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:27     .text.HAL_MspInit:00000000 HAL_MspInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:80     .text.HAL_MspInit:00000034 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:85     .text.HAL_I2C_MspInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:91     .text.HAL_I2C_MspInit:00000000 HAL_I2C_MspInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:199    .text.HAL_I2C_MspInit:00000064 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:206    .text.HAL_I2C_MspDeInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:212    .text.HAL_I2C_MspDeInit:00000000 HAL_I2C_MspDeInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:260    .text.HAL_I2C_MspDeInit:00000028 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:267    .text.HAL_UART_MspInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:273    .text.HAL_UART_MspInit:00000000 HAL_UART_MspInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:376    .text.HAL_UART_MspInit:00000060 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:382    .text.HAL_UART_MspDeInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:388    .text.HAL_UART_MspDeInit:00000000 HAL_UART_MspDeInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccYUsslp.s:431    .text.HAL_UART_MspDeInit:00000020 $d
 
 UNDEFINED SYMBOLS
 HAL_GPIO_Init
