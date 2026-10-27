@@ -22,7 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,6 +47,8 @@
 
 /* Private variables
    ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -54,6 +59,7 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -95,23 +101,53 @@ int main(void) {
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
-    HAL_StatusTypeDef sensor_status =
-        HAL_I2C_IsDeviceReady(&hi2c1, (0x44U << 1), 2U, 100U);
+    uint8_t response[6] = {0};
+    uint8_t command[2] = {0x24, 0x00};
+
+    // Declare sensory status variable
+    HAL_StatusTypeDef sensor_status;
+
+    // Transmit into sensor status, sends byte from stm to sensor
+    sensor_status = HAL_I2C_Master_Transmit(&hi2c1, (0x44U << 1), command,
+                                            sizeof(command), 100U);
+
+    // If fail then wait and go again
+    if (sensor_status != HAL_OK) {
+      HAL_Delay(HEARTBEAT_PERIOD_MS);
+      continue;
+    }
+
+    HAL_Delay(20);
+
+    // Sensor sends back data to stm
+    sensor_status = HAL_I2C_Master_Receive(&hi2c1, (0x44U << 1), response,
+                                           sizeof(response), 100U);
+    // Sensor sends each value as two bytes, we shift high byte then or to get
+    // full 16 bit value
+    uint16_t t_raw = ((uint16_t)response[0] << 8) | response[1];
+    uint16_t h_raw = ((uint16_t)response[3] << 8) | response[4];
+
+    // Convert to real units
+    int32_t temp_c100 = -4500 + (int32_t)(17500UL * t_raw / 65535UL);
+    int32_t rh100 = (int32_t)(10000UL * h_raw / 65535UL);
 
     char message[64]; // declared empty message aray 64 bytes wide
 
     // turns the counter into text while respecting the buffer size.
 
-    // snprintf writes to a destiantion buffer where its pointed to with first
-    // arg, size of is size of buffer, sample is what is written It also returns
-    // total number of characters that would be written or is
-    int length = snprintf(message, sizeof(message),
-                          "Sample %lu: I2C 0x44 %s\r\n", (unsigned long)counter,
-                          sensor_status == HAL_OK ? "ACK" : "no ACK");
+    // Print temp reading
+    int length;
+    if (sensor_status == HAL_OK) {
+      length = snprintf(message, sizeof(message),
+                        "Sample %lu: T=%ld.%02ld C RH=%ld.%02ld %%\r\n",
+                        (unsigned long)counter, (long)(temp_c100 / 100),
+                        (long)labs(temp_c100 % 100), (long)(rh100 / 100),
+                        (long)(rh100 % 100));
+    } else {
+      length = snprintf(message, sizeof(message), "Sample %lu: read failed\r\n",
+                        (unsigned long)counter);
+    }
 
-    // if lenght is valid, greater than 0 and length is less than the buffer
-    // meaning nothing was truncated, size_t cast is there becasue lenght is
-    // signed and size of is unsignged
     if (length > 0 && (size_t)length < sizeof(message)) {
       HAL_StatusTypeDef status = HAL_UART_Transmit(
           &huart2,
@@ -172,6 +208,26 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+    Error_Handler();
+  }
+}
+
+/**
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_I2C1_Init(void) {
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
     Error_Handler();
   }
 }
