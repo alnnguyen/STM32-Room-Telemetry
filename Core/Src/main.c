@@ -61,6 +61,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
+void sensor_test_run(void); // Core/Src/sensor_test.c
 
 /* USER CODE END PFP */
 
@@ -88,6 +89,9 @@ int main(void) {
   MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
+#ifdef SENSOR_TEST
+  sensor_test_run(); // never returns; see sensor_test.c
+#endif
 
   uint32_t counter = 0;
   /* USER CODE END 2 */
@@ -128,7 +132,7 @@ int main(void) {
     uint16_t h_raw = ((uint16_t)response[3] << 8) | response[4];
 
     // Convert to real units
-    int32_t temp_c100 = -4500 + (int32_t)(17500UL * t_raw / 65535UL);
+    int32_t temp_c100 = -4900 + (int32_t)(31500UL * t_raw / 65535UL);
     int32_t rh100 = (int32_t)(10000UL * h_raw / 65535UL);
 
     char message[64]; // declared empty message aray 64 bytes wide
@@ -139,7 +143,7 @@ int main(void) {
     int length;
     if (sensor_status == HAL_OK) {
       length = snprintf(message, sizeof(message),
-                        "Sample %lu: T=%ld.%02ld C RH=%ld.%02ld %%\r\n",
+                        "Sample %lu: T=%ld.%02ld F RH=%ld.%02ld %%\r\n",
                         (unsigned long)counter, (long)(temp_c100 / 100),
                         (long)labs(temp_c100 % 100), (long)(rh100 / 100),
                         (long)(rh100 % 100));
