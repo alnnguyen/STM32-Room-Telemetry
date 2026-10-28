@@ -37,6 +37,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/main.c \
+Core/Src/sht31.c \
 Core/Src/sensor_test.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
@@ -113,6 +114,10 @@ C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F401xE
 
+
+ifeq ($(SENSOR_TEST),1)
+C_DEFS += -DSENSOR_TEST
+endif
 
 # AS includes
 AS_INCLUDES = 

@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdint.h>
+#include "sht31.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,12 +61,62 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-void sensor_test_run(void); // Core/Src/sensor_test.c
+#ifdef SENSOR_TEST
+void sensor_test_run(void); /* Optional bring-up diagnostics. */
+#endif
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static void uart_send(const char *message, size_t length) {
+  if (HAL_UART_Transmit(&huart2, (const uint8_t *)message, (uint16_t)length,
+                         UART_TIMEOUT_MS) != HAL_OK) {
+    Error_Handler();
+  }
+}
+
+/* Preserve the peripheral-reset recovery used during bring-up.
+ * This cannot fix missing power, loose wires or a device holding SDA low.
+ */
+static void recover_i2c1(void) {
+  HAL_StatusTypeDef status = HAL_I2C_DeInit(&hi2c1);
+  if (status == HAL_OK) {
+    __HAL_RCC_I2C1_FORCE_RESET();
+    __HAL_RCC_I2C1_RELEASE_RESET();
+    status = HAL_I2C_Init(&hi2c1);
+  }
+  if (status != HAL_OK) {
+    static const char message[] = "I2C1 recovery failed; retrying next sample\r\n";
+    uart_send(message, sizeof(message) - 1U);
+  }
+}
+
+static void report_sample(uint32_t counter, SHT31_Status status,
+                          const SHT31_Reading *reading) {
+  char message[96];
+  int length;
+
+  if (status == SHT31_OK) {
+    /* The sign is separate so -50 hundredths prints as -0.50, not 0.50. */
+    long temperature = (long)reading->temperature_f100;
+    long magnitude = labs(temperature);
+    long humidity = (long)reading->humidity_rh100;
+
+    length = snprintf(message, sizeof(message),
+                      "Sample %lu: T=%s%ld.%02ld F RH=%ld.%02ld %% CRC=OK\r\n",
+                      (unsigned long)counter, temperature < 0 ? "-" : "",
+                      magnitude / 100L, magnitude % 100L,
+                      humidity / 100L, humidity % 100L);
+  } else {
+    length = snprintf(message, sizeof(message), "Sample %lu: SHT31 %s\r\n",
+                      (unsigned long)counter, SHT31_StatusText(status));
+  }
+
+  if (length > 0 && (size_t)length < sizeof(message)) {
+    uart_send(message, (size_t)length);
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -93,81 +143,28 @@ int main(void) {
   sensor_test_run(); // never returns; see sensor_test.c
 #endif
 
+  HAL_Delay(2U); /* Allow sensor power-up before the first command. */
+  recover_i2c1();
   uint32_t counter = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
   while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
-    uint8_t response[6] = {0};
-    uint8_t command[2] = {0x24, 0x00};
+    SHT31_Reading reading = {0};
+    SHT31_Status sensor_status = SHT31_Read(&hi2c1, &reading);
+    report_sample(counter, sensor_status, &reading);
 
-    // Declare sensory status variable
-    HAL_StatusTypeDef sensor_status;
-
-    // Transmit into sensor status, sends byte from stm to sensor
-    sensor_status = HAL_I2C_Master_Transmit(&hi2c1, (0x44U << 1), command,
-                                            sizeof(command), 100U);
-
-    // If fail then wait and go again
-    if (sensor_status != HAL_OK) {
-      HAL_Delay(HEARTBEAT_PERIOD_MS);
-      continue;
+    if (sensor_status == SHT31_TX_ERROR || sensor_status == SHT31_RX_ERROR) {
+      recover_i2c1();
     }
 
-    HAL_Delay(20);
-
-    // Sensor sends back data to stm
-    sensor_status = HAL_I2C_Master_Receive(&hi2c1, (0x44U << 1), response,
-                                           sizeof(response), 100U);
-    // Sensor sends each value as two bytes, we shift high byte then or to get
-    // full 16 bit value
-    uint16_t t_raw = ((uint16_t)response[0] << 8) | response[1];
-    uint16_t h_raw = ((uint16_t)response[3] << 8) | response[4];
-
-    // Convert to real units
-    int32_t temp_c100 = -4900 + (int32_t)(31500UL * t_raw / 65535UL);
-    int32_t rh100 = (int32_t)(10000UL * h_raw / 65535UL);
-
-    char message[64]; // declared empty message aray 64 bytes wide
-
-    // turns the counter into text while respecting the buffer size.
-
-    // Print temp reading
-    int length;
-    if (sensor_status == HAL_OK) {
-      length = snprintf(message, sizeof(message),
-                        "Sample %lu: T=%ld.%02ld F RH=%ld.%02ld %%\r\n",
-                        (unsigned long)counter, (long)(temp_c100 / 100),
-                        (long)labs(temp_c100 % 100), (long)(rh100 / 100),
-                        (long)(rh100 % 100));
-    } else {
-      length = snprintf(message, sizeof(message), "Sample %lu: read failed\r\n",
-                        (unsigned long)counter);
-    }
-
-    if (length > 0 && (size_t)length < sizeof(message)) {
-      HAL_StatusTypeDef status = HAL_UART_Transmit(
-          &huart2,
-          (uint8_t *)message, // HAL_UART_Transmit, first arg is settings and
-                              // state strcut for usart2 (baud rate, which pins,
-                              // passes pointer, 2nd is pointer to the data)
-          (uint16_t)length,
-          UART_TIMEOUT_MS); // 3rd is how many bytes to send, type cast for
-                            // bytes, give up after 100ms
-
-      if (status != HAL_OK) {
-        Error_Handler();
-      }
-    }
-
-    counter++;
+    counter++; /* Counts attempts, including failed measurements. */
     HAL_Delay(HEARTBEAT_PERIOD_MS);
   }
   /* USER CODE END 3 */
