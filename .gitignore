@@ -1,0 +1,6 @@
+# Build output (regenerate with make)
+build/
+build_*/
+
+# macOS
+.DS_Store
