@@ -54,9 +54,9 @@ UART_HandleTypeDef huart2;
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "defaultTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
 
@@ -148,8 +148,8 @@ static void oled_show_sample(uint32_t counter, SHT31_Status status,
     long magnitude = labs(temperature);
     long humidity = (long)reading->humidity_rh100;
 
-    snprintf(line, sizeof(line), "TEMP: %s%ld.%02ld F", temperature < 0 ? "-" : "",
-             magnitude / 100L, magnitude % 100L);
+    snprintf(line, sizeof(line), "TEMP: %s%ld.%02ld F",
+             temperature < 0 ? "-" : "", magnitude / 100L, magnitude % 100L);
     SSD1306_DrawText(0, 2, line);
     snprintf(line, sizeof(line), "HUMID: %ld.%02ld %%", humidity / 100L,
              humidity % 100L);
@@ -164,17 +164,33 @@ static void oled_show_sample(uint32_t counter, SHT31_Status status,
 
   if (SSD1306_Update(&hi2c1) != HAL_OK) {
     oled_ready = 0;
+    static const char message[] = "OLED update failed; will retry\r\n";
+    uart_send(message, sizeof(message) - 1U);
+  }
+}
+
+/* Called from the loop while the OLED is marked not ready: reset the I2C
+ * peripheral and run the init sequence again. A display that is still
+ * missing costs one short timeout per attempt, not a stalled loop.
+ */
+#define OLED_RETRY_SAMPLES 5U
+
+static void oled_try_init(void) {
+  recover_i2c1();
+  if (SSD1306_Init(&hi2c1) == HAL_OK) {
+    oled_ready = 1;
+    static const char message[] = "OLED re-initialised\r\n";
+    uart_send(message, sizeof(message) - 1U);
   }
 }
 
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
 
   /* USER CODE BEGIN 1 */
 
@@ -182,7 +198,8 @@ int main(void)
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -224,24 +241,16 @@ int main(void)
 
   if (oled_status == HAL_OK && SSD1306_Init(&hi2c1) == HAL_OK) {
     oled_ready = 1;
-    /* TEMP bring-up check: 0xA5 forces every pixel on; 0xA4 returns to RAM. */
-    SSD1306_SendCommand(&hi2c1, 0xA5);
-    HAL_Delay(2000U);
-    SSD1306_SendCommand(&hi2c1, 0xA4);
     const char message[] = "OLED init OK\r\n";
     uart_send(message, sizeof(message) - 1U);
   } else {
     const char message[] = "OLED init failed\r\n";
     uart_send(message, sizeof(message) - 1U);
   }
-
-  uint32_t counter = 0;
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  // osKernelInitialize(); // RTOS off for now. Creating tasks without starting
-  //                          the scheduler leaves BASEPRI masked, which freezes
-  //                          the TIM2 tick and hangs HAL_Delay.
+  osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -261,7 +270,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  // defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -272,8 +281,7 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  // osKernelStart(); // disabled for now: it never returns, so the while(1)
-                       // loop below (sensor + OLED) would never run.
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -283,42 +291,29 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-
-    SHT31_Reading reading = {0};
-    SHT31_Status sensor_status = SHT31_Read(&hi2c1, &reading);
-    report_sample(counter, sensor_status, &reading);
-    if (oled_ready) {
-      oled_show_sample(counter, sensor_status, &reading);
-    }
-
-    if (sensor_status == SHT31_TX_ERROR || sensor_status == SHT31_RX_ERROR) {
-      recover_i2c1();
-    }
-
-    counter++; /* Counts attempts, including failed measurements. */
-    HAL_Delay(HEARTBEAT_PERIOD_MS);
+    /* Never reached: osKernelStart() hands the CPU to the scheduler.
+     * The application loop lives in StartDefaultTask below.
+     */
   }
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -328,33 +323,30 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLN = 336;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
   RCC_OscInitStruct.PLL.PLLQ = 7;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
     Error_Handler();
   }
 }
 
 /**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C1_Init(void)
-{
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_I2C1_Init(void) {
 
   /* USER CODE BEGIN I2C1_Init 0 */
 
@@ -372,23 +364,20 @@ static void MX_I2C1_Init(void)
   hi2c1.Init.OwnAddress2 = 0;
   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
+ * @brief USART2 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART2_UART_Init(void) {
 
   /* USER CODE BEGIN USART2_Init 0 */
 
@@ -405,23 +394,20 @@ static void MX_USART2_UART_Init(void)
   huart2.Init.Mode = UART_MODE_TX_RX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
+  if (HAL_UART_Init(&huart2) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
@@ -460,37 +446,55 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the defaultTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
+void StartDefaultTask(void *argument) {
   /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  /* Step 1 of the RTOS move: the old superloop, unchanged, inside one task.
+   * Only difference: osDelay() instead of HAL_Delay(). osDelay puts this task
+   * to sleep so the scheduler can run something else (today: the idle task);
+   * HAL_Delay would spin the CPU doing nothing.
+   */
+  uint32_t counter = 0;
+
+  for (;;) {
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
+    SHT31_Reading reading = {0};
+    SHT31_Status sensor_status = SHT31_Read(&hi2c1, &reading);
+    report_sample(counter, sensor_status, &reading);
+    if (oled_ready) {
+      oled_show_sample(counter, sensor_status, &reading);
+    } else if (counter % OLED_RETRY_SAMPLES == 0U) {
+      oled_try_init();
+    }
+
+    if (sensor_status == SHT31_TX_ERROR || sensor_status == SHT31_RX_ERROR) {
+      recover_i2c1();
+    }
+
+    counter++; /* Counts attempts, including failed measurements. */
+    osDelay(HEARTBEAT_PERIOD_MS);
   }
   /* USER CODE END 5 */
 }
 
 /**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM2 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM2 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM2)
-  {
+  if (htim->Instance == TIM2) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
@@ -499,11 +503,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
@@ -513,14 +516,13 @@ void Error_Handler(void)
 }
 #ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line
      number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,

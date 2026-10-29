@@ -105,7 +105,7 @@ HAL_StatusTypeDef SSD1306_Init(I2C_HandleTypeDef *i2c) {
       0xDA, 0x12, /* COM pin layout for 128x64 */
       0x81, 0xCF, /* contrast */
       0xD9, 0xF1, /* pre-charge period */
-      0xDB, 0x40, /* VCOMH deselect level */
+      0xDB, 0x20, /* VCOMH deselect level: 0.77 x Vcc (datasheet reset value) */
       0xA4,       /* show RAM contents (not all-pixels-on) */
       0xA6,       /* normal (not inverted) */
       0xAF,       /* display on */
