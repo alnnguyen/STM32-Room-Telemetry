@@ -23,6 +23,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+#include "queue.h" /* xQueueOverwrite (no CMSIS-RTOS2 equivalent) */
 #include "sht31.h"
 #include "ssd1306.h"
 #include <stdio.h>
@@ -32,6 +34,13 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+/* One measurement, passed by copy from the sensor task to the output task. */
+typedef struct {
+  uint32_t counter; /* attempt number, including failures */
+  SHT31_Status status;
+  SHT31_Reading reading;   /* valid only when status == SHT31_OK */
+  int i2c_recovery_failed; /* sensor task tried an I2C reset and it failed */
+} SensorSample;
 
 /* USER CODE END PTD */
 
@@ -59,6 +68,33 @@ const osThreadAttr_t defaultTask_attributes = {
     .priority = (osPriority_t)osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+/* defaultTask (above, CubeMX-generated) is the sensor task. */
+
+/* Output task: prints and displays samples. Lower priority than the sensor,
+ * so a slow OLED or UART can never delay a measurement from starting.
+ */
+osThreadId_t outputTaskHandle;
+const osThreadAttr_t outputTask_attributes = {
+    .name = "outputTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t)osPriorityBelowNormal,
+};
+
+/* Mailbox: a queue of length 1 that the sensor overwrites. The output task
+ * always gets the newest sample; if it falls behind, old samples are
+ * replaced rather than piling up.
+ */
+osMessageQueueId_t sampleQueue;
+
+/* The SHT31 and the OLED share I2C1. Whoever holds this mutex owns the bus.
+ * Priority inheritance: if the low-priority output task holds it while the
+ * sensor task waits, the holder is temporarily raised so it finishes fast.
+ */
+osMutexId_t i2cMutex;
+const osMutexAttr_t i2cMutex_attributes = {
+    .name = "i2cMutex",
+    .attr_bits = osMutexPrioInherit,
+};
 
 /* USER CODE END PV */
 
@@ -87,20 +123,21 @@ static void uart_send(const char *message, size_t length) {
 
 /* Preserve the peripheral-reset recovery used during bring-up.
  * This cannot fix missing power, loose wires or a device holding SDA low.
+ * Returns the result instead of printing: only the output task uses UART.
+ * Caller must hold i2cMutex once the scheduler is running.
  */
-static void recover_i2c1(void) {
+static HAL_StatusTypeDef recover_i2c1(void) {
   HAL_StatusTypeDef status = HAL_I2C_DeInit(&hi2c1);
   if (status == HAL_OK) {
     __HAL_RCC_I2C1_FORCE_RESET();
     __HAL_RCC_I2C1_RELEASE_RESET();
     status = HAL_I2C_Init(&hi2c1);
   }
-  if (status != HAL_OK) {
-    static const char message[] =
-        "I2C1 recovery failed; retrying next sample\r\n";
-    uart_send(message, sizeof(message) - 1U);
-  }
+  return status;
 }
+
+static void i2c_lock(void) { osMutexAcquire(i2cMutex, osWaitForever); }
+static void i2c_unlock(void) { osMutexRelease(i2cMutex); }
 
 static void report_sample(uint32_t counter, SHT31_Status status,
                           const SHT31_Reading *reading) {
@@ -162,7 +199,12 @@ static void oled_show_sample(uint32_t counter, SHT31_Status status,
   snprintf(line, sizeof(line), "SAMPLE: %lu", (unsigned long)counter);
   SSD1306_DrawText(0, 5, line);
 
-  if (SSD1306_Update(&hi2c1) != HAL_OK) {
+  /* Drawing above only touched RAM; this is the only part that uses I2C. */
+  i2c_lock();
+  HAL_StatusTypeDef update_status = SSD1306_Update(&hi2c1);
+  i2c_unlock();
+
+  if (update_status != HAL_OK) {
     oled_ready = 0;
     static const char message[] = "OLED update failed; will retry\r\n";
     uart_send(message, sizeof(message) - 1U);
@@ -176,11 +218,44 @@ static void oled_show_sample(uint32_t counter, SHT31_Status status,
 #define OLED_RETRY_SAMPLES 5U
 
 static void oled_try_init(void) {
-  recover_i2c1();
-  if (SSD1306_Init(&hi2c1) == HAL_OK) {
+  i2c_lock();
+  HAL_StatusTypeDef status = recover_i2c1();
+  if (status == HAL_OK) {
+    status = SSD1306_Init(&hi2c1);
+  }
+  i2c_unlock();
+
+  if (status == HAL_OK) {
     oled_ready = 1;
     static const char message[] = "OLED re-initialised\r\n";
     uart_send(message, sizeof(message) - 1U);
+  }
+}
+
+/* Output task: sleeps until a sample arrives, then prints and draws it.
+ * It is the only task that uses the UART and the OLED framebuffer, so
+ * neither needs a lock; only the shared I2C bus does.
+ */
+static void StartOutputTask(void *argument) {
+  (void)argument;
+  SensorSample sample;
+
+  for (;;) {
+    if (osMessageQueueGet(sampleQueue, &sample, NULL, osWaitForever) != osOK) {
+      continue;
+    }
+
+    report_sample(sample.counter, sample.status, &sample.reading);
+    if (sample.i2c_recovery_failed) {
+      static const char message[] = "I2C1 recovery failed; retrying\r\n";
+      uart_send(message, sizeof(message) - 1U);
+    }
+
+    if (oled_ready) {
+      oled_show_sample(sample.counter, sample.status, &sample.reading);
+    } else if (sample.counter % OLED_RETRY_SAMPLES == 0U) {
+      oled_try_init();
+    }
   }
 }
 
@@ -223,7 +298,10 @@ int main(void) {
 #endif
 
   HAL_Delay(2U); /* Allow sensor power-up before the first command. */
-  recover_i2c1();
+  if (recover_i2c1() != HAL_OK) {
+    const char message[] = "I2C1 recovery failed at startup\r\n";
+    uart_send(message, sizeof(message) - 1U);
+  }
 
   // LCD INIT
   HAL_Delay(100U);
@@ -253,7 +331,10 @@ int main(void) {
   osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+  i2cMutex = osMutexNew(&i2cMutex_attributes);
+  if (i2cMutex == NULL) {
+    Error_Handler();
+  }
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -265,7 +346,10 @@ int main(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+  sampleQueue = osMessageQueueNew(1U, sizeof(SensorSample), NULL);
+  if (sampleQueue == NULL) {
+    Error_Handler();
+  }
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -273,7 +357,10 @@ int main(void) {
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  outputTaskHandle = osThreadNew(StartOutputTask, NULL, &outputTask_attributes);
+  if (outputTaskHandle == NULL) {
+    Error_Handler();
+  }
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -453,31 +540,36 @@ static void MX_GPIO_Init(void) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument) {
   /* USER CODE BEGIN 5 */
-  /* Step 1 of the RTOS move: the old superloop, unchanged, inside one task.
-   * Only difference: osDelay() instead of HAL_Delay(). osDelay puts this task
-   * to sleep so the scheduler can run something else (today: the idle task);
-   * HAL_Delay would spin the CPU doing nothing.
+  /* Sensor task: measure on a fixed schedule and publish each result.
+   * It never prints or draws; the output task does that from the queue.
    */
+  (void)argument;
   uint32_t counter = 0;
+  uint32_t next_wake = osKernelGetTickCount();
 
   for (;;) {
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
-    SHT31_Reading reading = {0};
-    SHT31_Status sensor_status = SHT31_Read(&hi2c1, &reading);
-    report_sample(counter, sensor_status, &reading);
-    if (oled_ready) {
-      oled_show_sample(counter, sensor_status, &reading);
-    } else if (counter % OLED_RETRY_SAMPLES == 0U) {
-      oled_try_init();
-    }
+    SensorSample sample = {0};
+    sample.counter = counter;
 
-    if (sensor_status == SHT31_TX_ERROR || sensor_status == SHT31_RX_ERROR) {
-      recover_i2c1();
+    i2c_lock();
+    sample.status = SHT31_Read(&hi2c1, &sample.reading);
+    if (sample.status == SHT31_TX_ERROR || sample.status == SHT31_RX_ERROR) {
+      sample.i2c_recovery_failed = (recover_i2c1() != HAL_OK);
     }
+    i2c_unlock();
+
+    /* Overwrite, never block: the sensor must not wait on a slow output. */
+    xQueueOverwrite((QueueHandle_t)sampleQueue, &sample);
 
     counter++; /* Counts attempts, including failed measurements. */
-    osDelay(HEARTBEAT_PERIOD_MS);
+
+    /* osDelayUntil wakes at fixed 1 s marks measured from the previous wake,
+     * so time spent reading the sensor does not stretch the period.
+     */
+    next_wake += HEARTBEAT_PERIOD_MS;
+    osDelayUntil(next_wake);
   }
   /* USER CODE END 5 */
 }
