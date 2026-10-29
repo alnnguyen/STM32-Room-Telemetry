@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
   28:Core/Src/sensor_test.c ****     }
   29:Core/Src/sensor_test.c ****     HAL_UART_Transmit(&huart2, (uint8_t *)buf, (uint16_t)n, 100U);
   30:Core/Src/sensor_test.c ****   }
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 2
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 2
 
 
   31:Core/Src/sensor_test.c **** }
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
   71              		.loc 1 39 26 is_stmt 0 view .LVU13
   72 001a 43B2     		sxtb	r3, r0
   73              		.loc 1 39 11 view .LVU14
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 3
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 3
 
 
   74 001c 002B     		cmp	r3, #0
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  114              		.cfi_endproc
  115              	.LFE138:
  117              		.section	.text.out,"ax",%progbits
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 4
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 4
 
 
  118              		.align	1
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  162 0018 08DD     		ble	.L12
   26:Core/Src/sensor_test.c ****       n = sizeof(buf) - 1;
  163              		.loc 1 26 5 is_stmt 1 view .LVU41
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 5
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 5
 
 
   26:Core/Src/sensor_test.c ****       n = sizeof(buf) - 1;
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
   46:Core/Src/sensor_test.c **** // (STM32F4 quirk: the BUSY flag can latch after a glitch and only a peripheral
   47:Core/Src/sensor_test.c **** // reset clears it, so pulse the RCC reset line, not just DeInit/Init.)
   48:Core/Src/sensor_test.c **** static void i2c_recover(void) {
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 6
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 6
 
 
  213              		.loc 1 48 31 is_stmt 1 view -0
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  255              		.section	.text.print_lines,"ax",%progbits
  256              		.align	1
  257              		.syntax unified
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 7
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 7
 
 
  258              		.thumb
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  300 0024 2846     		mov	r0, r5
  301 0026 FFF7FEFF 		bl	HAL_Delay
  302              	.LVL19:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 8
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 8
 
 
   67:Core/Src/sensor_test.c ****   uint32_t idr = GPIOB->IDR;
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  346              		.align	1
  347              		.syntax unified
  348              		.thumb
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 9
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 9
 
 
  349              		.thumb_func
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  396              	.LVL27:
  397              	.L28:
  398              		.loc 1 77 31 is_stmt 1 discriminator 1 view .LVU82
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 10
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 10
 
 
  399 001c 14F0800F 		tst	r4, #128
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  442              		.loc 1 88 3 is_stmt 1 view .LVU96
  443 0050 6946     		mov	r1, sp
  444 0052 0D48     		ldr	r0, .L35+12
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 11
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 11
 
 
  445 0054 FFF7FEFF 		bl	out
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  494              	.LC6:
  495 0004 00       		.ascii	"\000"
  496 0005 000000   		.align	2
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 12
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 12
 
 
  497              	.LC7:
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  532 0006 ADF81C30 		strh	r3, [sp, #28]	@ movhi
   93:Core/Src/sensor_test.c ****   uint8_t rx[6] = {0};
  533              		.loc 1 93 3 is_stmt 1 view .LVU106
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 13
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 13
 
 
  534              		.loc 1 93 11 is_stmt 0 view .LVU107
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  568 003c 0221     		movs	r1, #2
  569 003e 05A8     		add	r0, sp, #20
  570 0040 FFF7FEFF 		bl	crc8
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 14
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 14
 
 
  571              	.LVL43:
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  610              	.LCFI17:
  611              		.cfi_remember_state
  612              		.cfi_def_cfa_offset 8
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 15
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 15
 
 
  613              		@ sp needed
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  654 00b2 9DF81530 		ldrb	r3, [sp, #21]	@ zero_extendqisi2
  119:Core/Src/sensor_test.c ****   uint16_t h_raw = ((uint16_t)rx[3] << 8) | rx[4];
  655              		.loc 1 119 12 view .LVU142
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 16
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 16
 
 
  656 00b6 43EA0223 		orr	r3, r3, r2, lsl #8
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  696 00f2 B8BF     		it	lt
  697 00f4 5B42     		rsblt	r3, r3, #0
  698              	.LVL58:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 17
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 17
 
 
  124:Core/Src/sensor_test.c ****       labs(t100) / 100, labs(t100) % 100, (long)(h100 / 100),
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  746              		.thumb
  747              		.thumb_func
  749              	sensor_test_run:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 18
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 18
 
 
  750              	.LFB143:
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  793 002c 00000000 		.word	.LC11
  794 0030 00000240 		.word	1073872896
  795              		.cfi_endproc
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 19
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 19
 
 
  796              	.LFE143:
@@ -1097,35 +1097,35 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 1
  810              		.file 12 "/Applications/ArmGNUToolchain/15.3.rel2/arm-none-eabi/arm-none-eabi/include/stdio.h"
  811              		.file 13 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
  812              		.file 14 "<built-in>"
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s 			page 20
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 sensor_test.c
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:21     .text.crc8:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:26     .text.crc8:00000000 crc8
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:118    .text.out:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:123    .text.out:00000000 out
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:201    .text.out:00000038 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:206    .text.i2c_recover:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:211    .text.i2c_recover:00000000 i2c_recover
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:245    .text.i2c_recover:00000024 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:251    .rodata.print_lines.str1.4:00000000 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:256    .text.print_lines:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:261    .text.print_lines:00000000 print_lines
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:327    .text.print_lines:00000044 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:333    .rodata.scan_bus.str1.4:00000000 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:346    .text.scan_bus:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:351    .text.scan_bus:00000000 scan_bus
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:481    .text.scan_bus:0000007c $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:490    .rodata.read_sht31.str1.4:00000000 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:510    .text.read_sht31:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:515    .text.read_sht31:00000000 read_sht31
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:726    .text.read_sht31:0000012c $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:739    .rodata.sensor_test_run.str1.4:00000000 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:743    .text.sensor_test_run:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:749    .text.sensor_test_run:00000000 sensor_test_run
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccuwkUG4.s:793    .text.sensor_test_run:0000002c $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:21     .text.crc8:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:26     .text.crc8:00000000 crc8
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:118    .text.out:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:123    .text.out:00000000 out
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:201    .text.out:00000038 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:206    .text.i2c_recover:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:211    .text.i2c_recover:00000000 i2c_recover
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:245    .text.i2c_recover:00000024 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:251    .rodata.print_lines.str1.4:00000000 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:256    .text.print_lines:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:261    .text.print_lines:00000000 print_lines
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:327    .text.print_lines:00000044 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:333    .rodata.scan_bus.str1.4:00000000 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:346    .text.scan_bus:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:351    .text.scan_bus:00000000 scan_bus
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:481    .text.scan_bus:0000007c $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:490    .rodata.read_sht31.str1.4:00000000 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:510    .text.read_sht31:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:515    .text.read_sht31:00000000 read_sht31
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:726    .text.read_sht31:0000012c $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:739    .rodata.sensor_test_run.str1.4:00000000 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:743    .text.sensor_test_run:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:749    .text.sensor_test_run:00000000 sensor_test_run
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//ccT9C72D.s:793    .text.sensor_test_run:0000002c $d
 
 UNDEFINED SYMBOLS
 vsnprintf

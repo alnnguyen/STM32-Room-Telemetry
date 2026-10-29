@@ -1,0 +1,174 @@
+#include "ssd1306.h"
+#include "stm32f4xx_hal.h"
+#include <stdint.h>
+#include <string.h>
+
+#define SSD1306_ADDRESS (0x3CU << 1)
+#define SSD1306_TIMEOUT_MS 100U
+
+#define SSD1306_CONTROL_COMMAND 0x00U /* next byte is a command */
+#define SSD1306_CONTROL_DATA 0x40U    /* following bytes are pixel data */
+
+/* One byte = 8 vertical pixels (bit 0 on top). buffer[page][column]. */
+static uint8_t buffer[SSD1306_PAGES][SSD1306_WIDTH];
+
+/* 5x7 font for ASCII 32 (space) through 90 ('Z'). Each character is 5 column
+ * bytes, bit 0 = top pixel.
+ */
+static const uint8_t font5x7[][5] = {
+    {0x00, 0x00, 0x00, 0x00, 0x00}, /* space */
+    {0x00, 0x00, 0x5F, 0x00, 0x00}, /* ! */
+    {0x00, 0x07, 0x00, 0x07, 0x00}, /* " */
+    {0x14, 0x7F, 0x14, 0x7F, 0x14}, /* # */
+    {0x24, 0x2A, 0x7F, 0x2A, 0x12}, /* $ */
+    {0x23, 0x13, 0x08, 0x64, 0x62}, /* % */
+    {0x36, 0x49, 0x55, 0x22, 0x50}, /* & */
+    {0x00, 0x05, 0x03, 0x00, 0x00}, /* ' */
+    {0x00, 0x1C, 0x22, 0x41, 0x00}, /* ( */
+    {0x00, 0x41, 0x22, 0x1C, 0x00}, /* ) */
+    {0x14, 0x08, 0x3E, 0x08, 0x14}, /* * */
+    {0x08, 0x08, 0x3E, 0x08, 0x08}, /* + */
+    {0x00, 0x50, 0x30, 0x00, 0x00}, /* , */
+    {0x08, 0x08, 0x08, 0x08, 0x08}, /* - */
+    {0x00, 0x60, 0x60, 0x00, 0x00}, /* . */
+    {0x20, 0x10, 0x08, 0x04, 0x02}, /* / */
+    {0x3E, 0x51, 0x49, 0x45, 0x3E}, /* 0 */
+    {0x00, 0x42, 0x7F, 0x40, 0x00}, /* 1 */
+    {0x42, 0x61, 0x51, 0x49, 0x46}, /* 2 */
+    {0x21, 0x41, 0x45, 0x4B, 0x31}, /* 3 */
+    {0x18, 0x14, 0x12, 0x7F, 0x10}, /* 4 */
+    {0x27, 0x45, 0x45, 0x45, 0x39}, /* 5 */
+    {0x3C, 0x4A, 0x49, 0x49, 0x30}, /* 6 */
+    {0x01, 0x71, 0x09, 0x05, 0x03}, /* 7 */
+    {0x36, 0x49, 0x49, 0x49, 0x36}, /* 8 */
+    {0x06, 0x49, 0x49, 0x29, 0x1E}, /* 9 */
+    {0x00, 0x36, 0x36, 0x00, 0x00}, /* : */
+    {0x00, 0x56, 0x36, 0x00, 0x00}, /* ; */
+    {0x08, 0x14, 0x22, 0x41, 0x00}, /* < */
+    {0x14, 0x14, 0x14, 0x14, 0x14}, /* = */
+    {0x00, 0x41, 0x22, 0x14, 0x08}, /* > */
+    {0x02, 0x01, 0x51, 0x09, 0x06}, /* ? */
+    {0x32, 0x49, 0x79, 0x41, 0x3E}, /* @ */
+    {0x7E, 0x11, 0x11, 0x11, 0x7E}, /* A */
+    {0x7F, 0x49, 0x49, 0x49, 0x36}, /* B */
+    {0x3E, 0x41, 0x41, 0x41, 0x22}, /* C */
+    {0x7F, 0x41, 0x41, 0x22, 0x1C}, /* D */
+    {0x7F, 0x49, 0x49, 0x49, 0x41}, /* E */
+    {0x7F, 0x09, 0x09, 0x09, 0x01}, /* F */
+    {0x3E, 0x41, 0x49, 0x49, 0x7A}, /* G */
+    {0x7F, 0x08, 0x08, 0x08, 0x7F}, /* H */
+    {0x00, 0x41, 0x7F, 0x41, 0x00}, /* I */
+    {0x20, 0x40, 0x41, 0x3F, 0x01}, /* J */
+    {0x7F, 0x08, 0x14, 0x22, 0x41}, /* K */
+    {0x7F, 0x40, 0x40, 0x40, 0x40}, /* L */
+    {0x7F, 0x02, 0x0C, 0x02, 0x7F}, /* M */
+    {0x7F, 0x04, 0x08, 0x10, 0x7F}, /* N */
+    {0x3E, 0x41, 0x41, 0x41, 0x3E}, /* O */
+    {0x7F, 0x09, 0x09, 0x09, 0x06}, /* P */
+    {0x3E, 0x41, 0x51, 0x21, 0x5E}, /* Q */
+    {0x7F, 0x09, 0x19, 0x29, 0x46}, /* R */
+    {0x46, 0x49, 0x49, 0x49, 0x31}, /* S */
+    {0x01, 0x01, 0x7F, 0x01, 0x01}, /* T */
+    {0x3F, 0x40, 0x40, 0x40, 0x3F}, /* U */
+    {0x1F, 0x20, 0x40, 0x20, 0x1F}, /* V */
+    {0x3F, 0x40, 0x38, 0x40, 0x3F}, /* W */
+    {0x63, 0x14, 0x08, 0x14, 0x63}, /* X */
+    {0x07, 0x08, 0x70, 0x08, 0x07}, /* Y */
+    {0x61, 0x51, 0x49, 0x45, 0x43}, /* Z */
+};
+
+#define FONT_FIRST_CHAR 32
+#define FONT_LAST_CHAR 90
+#define FONT_WIDTH 5U
+#define FONT_ADVANCE 6U /* 5 pixel columns + 1 blank column between letters */
+
+HAL_StatusTypeDef SSD1306_SendCommand(I2C_HandleTypeDef *i2c, uint8_t command) {
+  /* Control byte 0x00 tells the display "the next byte is a command". */
+  uint8_t packet[2] = {SSD1306_CONTROL_COMMAND, command};
+
+  return HAL_I2C_Master_Transmit(i2c, SSD1306_ADDRESS, packet, sizeof(packet),
+                                 SSD1306_TIMEOUT_MS);
+}
+
+HAL_StatusTypeDef SSD1306_Init(I2C_HandleTypeDef *i2c) {
+  /* Standard power-up sequence for a 128x64 panel with its charge pump. */
+  static const uint8_t init_sequence[] = {
+      0xAE,       /* display off while configuring */
+      0xD5, 0x80, /* clock divide / oscillator frequency */
+      0xA8, 0x3F, /* multiplex ratio: 64 rows */
+      0xD3, 0x00, /* display offset: none */
+      0x40,       /* start line = 0 */
+      0x8D, 0x14, /* enable the internal charge pump (runs from 3.3 V) */
+      0x20, 0x00, /* horizontal addressing mode */
+      0xA1,       /* flip columns so x=0 is on the left */
+      0xC8,       /* flip rows so y=0 is at the top */
+      0xDA, 0x12, /* COM pin layout for 128x64 */
+      0x81, 0xCF, /* contrast */
+      0xD9, 0xF1, /* pre-charge period */
+      0xDB, 0x40, /* VCOMH deselect level */
+      0xA4,       /* show RAM contents (not all-pixels-on) */
+      0xA6,       /* normal (not inverted) */
+      0xAF,       /* display on */
+  };
+
+  for (size_t i = 0; i < sizeof(init_sequence); i++) {
+    HAL_StatusTypeDef status = SSD1306_SendCommand(i2c, init_sequence[i]);
+    if (status != HAL_OK) {
+      return status;
+    }
+  }
+
+  SSD1306_Clear();
+  return SSD1306_Update(i2c);
+}
+
+void SSD1306_Clear(void) { memset(buffer, 0, sizeof(buffer)); }
+
+void SSD1306_DrawText(uint8_t x, uint8_t row, const char *text) {
+  if (row >= SSD1306_PAGES || text == NULL) {
+    return;
+  }
+
+  for (; *text != '\0'; text++) {
+    if (x + FONT_WIDTH > SSD1306_WIDTH) {
+      return; /* no room for another character on this row */
+    }
+
+    int c = (unsigned char)*text;
+    if (c >= 'a' && c <= 'z') {
+      c -= 'a' - 'A';
+    }
+    if (c < FONT_FIRST_CHAR || c > FONT_LAST_CHAR) {
+      c = '?';
+    }
+
+    for (uint8_t col = 0; col < FONT_WIDTH; col++) {
+      buffer[row][x + col] = font5x7[c - FONT_FIRST_CHAR][col];
+    }
+    x = (uint8_t)(x + FONT_ADVANCE);
+  }
+}
+
+HAL_StatusTypeDef SSD1306_Update(I2C_HandleTypeDef *i2c) {
+  /* Tell the display to expect columns 0..127 and pages 0..7. */
+  static const uint8_t window[] = {0x21, 0x00, 0x7F, 0x22, 0x00, 0x07};
+  for (size_t i = 0; i < sizeof(window); i++) {
+    HAL_StatusTypeDef status = SSD1306_SendCommand(i2c, window[i]);
+    if (status != HAL_OK) {
+      return status;
+    }
+  }
+
+  /* Send one page (128 bytes) at a time, each prefixed by the "data" byte. */
+  uint8_t packet[1U + SSD1306_WIDTH];
+  packet[0] = SSD1306_CONTROL_DATA;
+  for (uint8_t page = 0; page < SSD1306_PAGES; page++) {
+    memcpy(&packet[1], buffer[page], SSD1306_WIDTH);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(
+        i2c, SSD1306_ADDRESS, packet, sizeof(packet), SSD1306_TIMEOUT_MS);
+    if (status != HAL_OK) {
+      return status;
+    }
+  }
+  return HAL_OK;
+}

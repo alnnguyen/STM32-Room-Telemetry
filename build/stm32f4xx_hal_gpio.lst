@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
   27:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   Subject to the specific hardware characteristics of each I/O port listed in the datasheet, each
   28:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   port bit of the General Purpose IO (GPIO) Ports, can be individually configured by software
   29:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   in several modes:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 2
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 2
 
 
   30:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   (+) Input mode 
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
   84:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****             
   85:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****     (#) To set/reset the level of a pin configured in output mode use 
   86:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         HAL_GPIO_WritePin()/HAL_GPIO_TogglePin().
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 3
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 3
 
 
   87:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****     
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  141:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   *  @brief    Initialization and Configuration functions
  142:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   *
  143:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** @verbatim    
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 4
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 4
 
 
  144:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****  ===============================================================================
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
   53              		.loc 1 174 3 view .LVU8
  175:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** 
  176:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   /* Configure the port pins */
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 5
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 5
 
 
  177:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   for(position = 0U; position < GPIO_NUMBER; position++)
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  199:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         /* Configure the IO Output Type */
  200:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         temp = GPIOx->OTYPER;
   86              		.loc 1 200 9 is_stmt 1 view .LVU25
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 6
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 6
 
 
   87              		.loc 1 200 14 is_stmt 0 view .LVU26
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  117 0040 50F82120 		ldr	r2, [r0, r1, lsl #2]
  118              	.LVL11:
  225:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         temp &= ~(0xFU << ((uint32_t)(position & 0x07U) * 4U)) ;
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 7
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 7
 
 
  119              		.loc 1 225 9 is_stmt 1 view .LVU40
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  153              		.loc 1 245 14 discriminator 11 view .LVU54
  154 0070 2A43     		orrs	r2, r2, r5
  155              	.LVL15:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 8
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 8
 
 
  246:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         SYSCFG->EXTICR[position >> 2U] = temp;
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  196              		.loc 1 259 9 is_stmt 1 view .LVU73
  197              		.loc 1 259 11 is_stmt 0 view .LVU74
  198 009c DEF80460 		ldr	r6, [lr, #4]
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 9
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 9
 
 
  199 00a0 16F4001F 		tst	r6, #2097152
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  237              		.loc 1 275 14 is_stmt 0 view .LVU92
  238 00c8 0A40     		ands	r2, r2, r1
  239              	.LVL27:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 10
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 10
 
 
  276:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         if((GPIO_Init->Mode & EXTI_IT) != 0x00U)
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  279              		.loc 1 188 7 is_stmt 1 view .LVU109
  188:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****           (GPIO_Init->Mode & GPIO_MODE) == MODE_AF)
  280              		.loc 1 188 28 is_stmt 0 view .LVU110
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 11
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 11
 
 
  281 00f4 DEF80410 		ldr	r1, [lr, #4]
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  318 0124 0A43     		orrs	r2, r2, r1
  319              	.LVL36:
  215:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****       }
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 12
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 12
 
 
  320              		.loc 1 215 9 is_stmt 1 view .LVU128
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  357              		.loc 1 234 7 is_stmt 1 view .LVU145
  234:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** 
  358              		.loc 1 234 20 is_stmt 0 view .LVU146
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 13
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 13
 
 
  359 0152 0260     		str	r2, [r0]
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  398 0184 4FEA8C0C 		lsl	ip, ip, #2
  244:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         temp |= ((uint32_t)(GPIO_GET_INDEX(GPIOx)) << (4U * (position & 0x03U)));
  399              		.loc 1 244 25 view .LVU162
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 14
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 14
 
 
  400 0188 0F22     		movs	r2, #15
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  442 01c8 0322     		movs	r2, #3
  443 01ca 4FE7     		b	.L7
  444              	.LVL47:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 15
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 15
 
 
  445              	.L19:
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  302:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   assert_param(IS_GPIO_ALL_INSTANCE(GPIOx));
  480              		.loc 1 302 3 view .LVU181
  303:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 16
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 16
 
 
  304:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   /* Configure the port pins */
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  324:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         EXTI->FTSR &= ~((uint32_t)iocurrent);
  325:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         EXTI->RTSR &= ~((uint32_t)iocurrent);
  326:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** 
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 17
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 17
 
 
  327:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         /* Configure the External Interrupt or event for the current IO */
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  551              	.LVL52:
  552              		.loc 1 343 22 view .LVU207
  553 0056 4260     		str	r2, [r0, #4]
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 18
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 18
 
 
  344:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  592 0082 03F0030C 		and	ip, r3, #3
  316:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****       if(tmp == ((uint32_t)(GPIO_GET_INDEX(GPIOx)) << (4U * (position & 0x03U))))
  593              		.loc 1 316 28 view .LVU224
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 19
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 19
 
 
  594 0086 4FEA8C0C 		lsl	ip, ip, #2
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  636 00c6 A3E7     		b	.L28
  637              	.L40:
  320:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****         EXTI->EMR &= ~((uint32_t)iocurrent);
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 20
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 20
 
 
  638              		.loc 1 320 9 is_stmt 1 view .LVU237
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  675 00f4 25EA0705 		bic	r5, r5, r7
  676 00f8 46F82450 		str	r5, [r6, r4, lsl #2]
  677 00fc 8CE7     		b	.L29
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 21
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 21
 
 
  678              	.LVL62:
@@ -1258,7 +1258,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  369:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   * @param  GPIOx where x can be (A..K) to select the GPIO peripheral for STM32F429X device or
  370:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   *                      x can be (A..I) to select the GPIO peripheral for STM32F40XX and STM32F427
  371:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   * @param  GPIO_Pin specifies the port bit to read.
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 22
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 22
 
 
  372:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   *         This parameter can be GPIO_PIN_x where x can be (0..15).
@@ -1318,7 +1318,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  748              	HAL_GPIO_WritePin:
  749              	.LVL68:
  750              	.LFB137:
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 23
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 23
 
 
  392:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  772              		.loc 1 424 1 view .LVU278
  773 000a 7047     		bx	lr
  774              		.cfi_endproc
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 24
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 24
 
 
  775              	.LFE137:
@@ -1438,7 +1438,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  810              		.cfi_endproc
  811              	.LFE138:
  813              		.section	.text.HAL_GPIO_LockPin,"ax",%progbits
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 25
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 25
 
 
  814              		.align	1
@@ -1498,7 +1498,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  469:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   /* Reset LCKx bit(s): LCKK='0' + LCK[15-0] */
  470:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   GPIOx->LCKR = GPIO_Pin;
  846              		.loc 1 470 3 is_stmt 1 view .LVU299
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 26
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 26
 
 
  847              		.loc 1 470 15 is_stmt 0 view .LVU300
@@ -1558,7 +1558,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  884              		.cfi_endproc
  885              	.LFE139:
  887              		.section	.text.HAL_GPIO_EXTI_Callback,"ax",%progbits
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 27
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 27
 
 
  888              		.align	1
@@ -1618,7 +1618,7 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  916              	.LVL78:
  917              	.LFB140:
  493:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c ****   /* EXTI line interrupt detected */
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 28
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 28
 
 
  918              		.loc 1 493 1 is_stmt 1 view -0
@@ -1674,29 +1674,29 @@ ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 1
  961              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
  962              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
  963              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
-ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s 			page 29
+ARM GAS  /var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s 			page 29
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32f4xx_hal_gpio.c
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:21     .text.HAL_GPIO_Init:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:27     .text.HAL_GPIO_Init:00000000 HAL_GPIO_Init
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:455    .text.HAL_GPIO_Init:000001d0 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:463    .text.HAL_GPIO_DeInit:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:469    .text.HAL_GPIO_DeInit:00000000 HAL_GPIO_DeInit
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:696    .text.HAL_GPIO_DeInit:00000104 $d
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:703    .text.HAL_GPIO_ReadPin:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:709    .text.HAL_GPIO_ReadPin:00000000 HAL_GPIO_ReadPin
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:742    .text.HAL_GPIO_WritePin:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:748    .text.HAL_GPIO_WritePin:00000000 HAL_GPIO_WritePin
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:778    .text.HAL_GPIO_TogglePin:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:784    .text.HAL_GPIO_TogglePin:00000000 HAL_GPIO_TogglePin
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:814    .text.HAL_GPIO_LockPin:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:820    .text.HAL_GPIO_LockPin:00000000 HAL_GPIO_LockPin
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:888    .text.HAL_GPIO_EXTI_Callback:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:894    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:909    .text.HAL_GPIO_EXTI_IRQHandler:00000000 $t
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:915    .text.HAL_GPIO_EXTI_IRQHandler:00000000 HAL_GPIO_EXTI_IRQHandler
-/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cc8euNIp.s:952    .text.HAL_GPIO_EXTI_IRQHandler:00000018 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:21     .text.HAL_GPIO_Init:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:27     .text.HAL_GPIO_Init:00000000 HAL_GPIO_Init
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:455    .text.HAL_GPIO_Init:000001d0 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:463    .text.HAL_GPIO_DeInit:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:469    .text.HAL_GPIO_DeInit:00000000 HAL_GPIO_DeInit
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:696    .text.HAL_GPIO_DeInit:00000104 $d
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:703    .text.HAL_GPIO_ReadPin:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:709    .text.HAL_GPIO_ReadPin:00000000 HAL_GPIO_ReadPin
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:742    .text.HAL_GPIO_WritePin:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:748    .text.HAL_GPIO_WritePin:00000000 HAL_GPIO_WritePin
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:778    .text.HAL_GPIO_TogglePin:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:784    .text.HAL_GPIO_TogglePin:00000000 HAL_GPIO_TogglePin
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:814    .text.HAL_GPIO_LockPin:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:820    .text.HAL_GPIO_LockPin:00000000 HAL_GPIO_LockPin
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:888    .text.HAL_GPIO_EXTI_Callback:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:894    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:909    .text.HAL_GPIO_EXTI_IRQHandler:00000000 $t
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:915    .text.HAL_GPIO_EXTI_IRQHandler:00000000 HAL_GPIO_EXTI_IRQHandler
+/var/folders/y2/vcd__b_j7t36kd05mb3jp2l80000gn/T//cczSYl53.s:952    .text.HAL_GPIO_EXTI_IRQHandler:00000018 $d
 
 NO UNDEFINED SYMBOLS
