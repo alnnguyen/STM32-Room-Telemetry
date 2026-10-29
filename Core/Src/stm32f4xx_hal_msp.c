@@ -176,6 +176,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* USER CODE BEGIN USART2_MspInit 1 */
+    /* RX interrupt for the command task, added by hand (not via CubeMX).
+     * Priority 6: an ISR that calls FreeRTOS functions must be numerically
+     * >= configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (5).
+     * If "USART2 global interrupt" is ever enabled in CubeMX, delete this
+     * and USART2_IRQHandler in stm32f4xx_it.c to avoid duplicates.
+     */
+    HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
 
     /* USER CODE END USART2_MspInit 1 */
 

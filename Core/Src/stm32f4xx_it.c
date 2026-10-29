@@ -58,6 +58,7 @@
 extern TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN EV */
+extern UART_HandleTypeDef huart2;
 
 /* USER CODE END EV */
 
@@ -174,5 +175,9 @@ void TIM2_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+/* USART2 interrupt (enabled in HAL_UART_MspInit). HAL works out what
+ * happened and calls HAL_UART_RxCpltCallback / ErrorCallback in main.c.
+ */
+void USART2_IRQHandler(void) { HAL_UART_IRQHandler(&huart2); }
 
 /* USER CODE END 1 */

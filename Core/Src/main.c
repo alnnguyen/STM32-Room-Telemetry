@@ -25,10 +25,14 @@
 /* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
 #include "queue.h" /* xQueueOverwrite (no CMSIS-RTOS2 equivalent) */
+#include "task.h"  /* taskENTER_CRITICAL */
 #include "sht31.h"
 #include "ssd1306.h"
+#include <ctype.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -48,6 +52,9 @@ typedef struct {
 /* USER CODE BEGIN PD */
 #define HEARTBEAT_PERIOD_MS 1000U
 #define UART_TIMEOUT_MS 100U
+#define ALERT_OFF INT32_MAX  /* threshold value meaning "no alert set" */
+#define CMD_LINE_MAX 32U     /* longest command line, including the '\0' */
+#define RX_QUEUE_LENGTH 64U  /* typed bytes buffered between ISR and task */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -96,6 +103,47 @@ const osMutexAttr_t i2cMutex_attributes = {
     .attr_bits = osMutexPrioInherit,
 };
 
+/* Command task: reads typed lines from UART and acts on them. It sleeps on
+ * rxQueue, so it costs nothing until a key is pressed.
+ */
+osThreadId_t commandTaskHandle;
+const osThreadAttr_t commandTask_attributes = {
+    .name = "commandTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t)osPriorityBelowNormal,
+};
+
+/* Bytes from the UART receive interrupt to the command task. The ISR must
+ * not do real work, so it only drops each byte in here.
+ */
+osMessageQueueId_t rxQueue;
+static uint8_t rx_byte; /* HAL writes each received byte here */
+
+/* Output and command tasks both print, so UART now needs a lock too. */
+osMutexId_t uartMutex;
+const osMutexAttr_t uartMutex_attributes = {
+    .name = "uartMutex",
+    .attr_bits = osMutexPrioInherit,
+};
+
+/* Set by the command task, read by the output task. A single aligned 32-bit
+ * read or write is atomic on Cortex-M4, so no lock is needed.
+ */
+static volatile int32_t alert_threshold_f100 = ALERT_OFF;
+
+/* Set by the command task while a command is half-typed; the output task
+ * skips its UART sample line meanwhile so it doesn't land in the middle of
+ * your typing. Measurement and the OLED are unaffected.
+ */
+static volatile int user_typing = 0;
+
+/* Copy of the newest sample for the "status" command. The mailbox can't be
+ * used for this: reading it would take the sample away from the output task.
+ * Guarded by a critical section because it is larger than one word.
+ */
+static SensorSample latest_sample;
+static int latest_valid = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,16 +162,29 @@ void sensor_test_run(void); /* Optional bring-up diagnostics. */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* Before the scheduler starts there is only one thread of execution, so the
+ * lock is skipped (and the mutex may not exist yet).
+ */
 static void uart_send(const char *message, size_t length) {
-  if (HAL_UART_Transmit(&huart2, (const uint8_t *)message, (uint16_t)length,
-                        UART_TIMEOUT_MS) != HAL_OK) {
+  int lock = (osKernelGetState() == osKernelRunning);
+  if (lock) {
+    osMutexAcquire(uartMutex, osWaitForever);
+  }
+  HAL_StatusTypeDef status = HAL_UART_Transmit(
+      &huart2, (const uint8_t *)message, (uint16_t)length, UART_TIMEOUT_MS);
+  if (lock) {
+    osMutexRelease(uartMutex);
+  }
+  if (status != HAL_OK) {
     Error_Handler();
   }
 }
 
+static void uart_send_text(const char *text) { uart_send(text, strlen(text)); }
+
 /* Preserve the peripheral-reset recovery used during bring-up.
  * This cannot fix missing power, loose wires or a device holding SDA low.
- * Returns the result instead of printing: only the output task uses UART.
+ * Returns the result; the caller decides what to report.
  * Caller must hold i2cMutex once the scheduler is running.
  */
 static HAL_StatusTypeDef recover_i2c1(void) {
@@ -140,7 +201,7 @@ static void i2c_lock(void) { osMutexAcquire(i2cMutex, osWaitForever); }
 static void i2c_unlock(void) { osMutexRelease(i2cMutex); }
 
 static void report_sample(uint32_t counter, SHT31_Status status,
-                          const SHT31_Reading *reading) {
+                          const SHT31_Reading *reading, int alert) {
   char message[96];
   int length;
 
@@ -151,10 +212,10 @@ static void report_sample(uint32_t counter, SHT31_Status status,
     long humidity = (long)reading->humidity_rh100;
 
     length = snprintf(message, sizeof(message),
-                      "Sample %lu: T=%s%ld.%02ld F RH=%ld.%02ld %% CRC=OK\r\n",
+                      "Sample %lu: T=%s%ld.%02ld F RH=%ld.%02ld %% CRC=OK%s\r\n",
                       (unsigned long)counter, temperature < 0 ? "-" : "",
                       magnitude / 100L, magnitude % 100L, humidity / 100L,
-                      humidity % 100L);
+                      humidity % 100L, alert ? " ALERT" : "");
   } else {
     length = snprintf(message, sizeof(message), "Sample %lu: SHT31 %s\r\n",
                       (unsigned long)counter, SHT31_StatusText(status));
@@ -174,7 +235,8 @@ static int oled_ready = 0;
  * SSD1306_Update() is what sends it to the panel over I2C.
  */
 static void oled_show_sample(uint32_t counter, SHT31_Status status,
-                             const SHT31_Reading *reading) {
+                             const SHT31_Reading *reading, int32_t threshold,
+                             int alert) {
   char line[24];
 
   SSD1306_Clear();
@@ -198,6 +260,12 @@ static void oled_show_sample(uint32_t counter, SHT31_Status status,
 
   snprintf(line, sizeof(line), "SAMPLE: %lu", (unsigned long)counter);
   SSD1306_DrawText(0, 5, line);
+
+  if (threshold != ALERT_OFF) {
+    snprintf(line, sizeof(line), alert ? "ALERT! > %ld F" : "LIMIT: %ld F",
+             (long)(threshold / 100));
+    SSD1306_DrawText(0, 7, line);
+  }
 
   /* Drawing above only touched RAM; this is the only part that uses I2C. */
   i2c_lock();
@@ -233,8 +301,8 @@ static void oled_try_init(void) {
 }
 
 /* Output task: sleeps until a sample arrives, then prints and draws it.
- * It is the only task that uses the UART and the OLED framebuffer, so
- * neither needs a lock; only the shared I2C bus does.
+ * It is the only task that uses the OLED framebuffer, so that needs no lock.
+ * I2C and UART are shared, so those go through their mutexes.
  */
 static void StartOutputTask(void *argument) {
   (void)argument;
@@ -245,16 +313,157 @@ static void StartOutputTask(void *argument) {
       continue;
     }
 
-    report_sample(sample.counter, sample.status, &sample.reading);
+    /* Read the threshold once so the UART line and the OLED agree. */
+    int32_t threshold = alert_threshold_f100;
+    int alert = (sample.status == SHT31_OK && threshold != ALERT_OFF &&
+                 sample.reading.temperature_f100 > threshold);
+
+    if (!user_typing) {
+      report_sample(sample.counter, sample.status, &sample.reading, alert);
+    }
     if (sample.i2c_recovery_failed) {
       static const char message[] = "I2C1 recovery failed; retrying\r\n";
       uart_send(message, sizeof(message) - 1U);
     }
 
     if (oled_ready) {
-      oled_show_sample(sample.counter, sample.status, &sample.reading);
+      oled_show_sample(sample.counter, sample.status, &sample.reading,
+                       threshold, alert);
     } else if (sample.counter % OLED_RETRY_SAMPLES == 0U) {
       oled_try_init();
+    }
+  }
+}
+
+/* ---- Command task --------------------------------------------------------*/
+
+/* Runs in interrupt context, once per received byte. Keep it tiny: hand the
+ * byte to the command task and re-arm reception for the next one.
+ */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart->Instance == USART2) {
+    osMessageQueuePut(rxQueue, &rx_byte, 0U, 0U); /* drops the byte if full */
+    HAL_UART_Receive_IT(&huart2, &rx_byte, 1U);
+  }
+}
+
+/* A receive error (e.g. overrun) stops HAL's reception; restart it. */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+  if (huart->Instance == USART2) {
+    HAL_UART_Receive_IT(&huart2, &rx_byte, 1U);
+  }
+}
+
+static void print_status(void) {
+  SensorSample sample;
+  int valid;
+
+  /* Copy under a critical section so the sensor task can't update the
+   * struct halfway through our read.
+   */
+  taskENTER_CRITICAL();
+  sample = latest_sample;
+  valid = latest_valid;
+  taskEXIT_CRITICAL();
+
+  char message[96];
+  if (!valid) {
+    uart_send_text("No sample yet\r\n");
+  } else if (sample.status != SHT31_OK) {
+    snprintf(message, sizeof(message), "Last sample %lu: SHT31 %s\r\n",
+             (unsigned long)sample.counter, SHT31_StatusText(sample.status));
+    uart_send_text(message);
+  } else {
+    long temperature = (long)sample.reading.temperature_f100;
+    long magnitude = labs(temperature);
+    long humidity = (long)sample.reading.humidity_rh100;
+    snprintf(message, sizeof(message),
+             "Last sample %lu: T=%s%ld.%02ld F RH=%ld.%02ld %%\r\n",
+             (unsigned long)sample.counter, temperature < 0 ? "-" : "",
+             magnitude / 100L, magnitude % 100L, humidity / 100L,
+             humidity % 100L);
+    uart_send_text(message);
+  }
+
+  int32_t threshold = alert_threshold_f100;
+  if (threshold == ALERT_OFF) {
+    snprintf(message, sizeof(message), "Alert: off   OLED: %s\r\n",
+             oled_ready ? "ok" : "not responding");
+  } else {
+    snprintf(message, sizeof(message), "Alert: above %ld F   OLED: %s\r\n",
+             (long)(threshold / 100), oled_ready ? "ok" : "not responding");
+  }
+  uart_send_text(message);
+}
+
+static void handle_command(char *line) {
+  for (char *p = line; *p != '\0'; p++) {
+    *p = (char)tolower((unsigned char)*p);
+  }
+
+  if (strcmp(line, "help") == 0) {
+    uart_send_text("Commands:\r\n"
+                   "  status       latest reading and settings\r\n"
+                   "  alert <F>    warn when temperature goes above <F>\r\n"
+                   "  alert off    disable the warning\r\n");
+  } else if (strcmp(line, "status") == 0) {
+    print_status();
+  } else if (strcmp(line, "alert off") == 0) {
+    alert_threshold_f100 = ALERT_OFF;
+    uart_send_text("Alert off\r\n");
+  } else if (strncmp(line, "alert ", 6) == 0) {
+    char *end;
+    long degrees = strtol(line + 6, &end, 10);
+    if (end == line + 6 || *end != '\0' || degrees < -40 || degrees > 200) {
+      uart_send_text("Usage: alert <whole degrees F, -40..200> or alert off\r\n");
+    } else {
+      alert_threshold_f100 = (int32_t)(degrees * 100);
+      char message[48];
+      snprintf(message, sizeof(message), "Alert set: above %ld F\r\n", degrees);
+      uart_send_text(message);
+    }
+  } else {
+    uart_send_text("Unknown command; type 'help'\r\n");
+  }
+}
+
+/* Builds a line from typed bytes, echoing them so you can see what you type
+ * (the serial terminal does not echo locally). Enter runs the command.
+ */
+static void StartCommandTask(void *argument) {
+  (void)argument;
+  char line[CMD_LINE_MAX];
+  size_t length = 0;
+  uint8_t ch;
+
+  HAL_UART_Receive_IT(&huart2, &rx_byte, 1U); /* start listening */
+  uart_send_text("Type 'help' and press Enter for commands\r\n");
+
+  for (;;) {
+    if (osMessageQueueGet(rxQueue, &ch, NULL, osWaitForever) != osOK) {
+      continue;
+    }
+
+    if (ch == '\r' || ch == '\n') {
+      if (length > 0) {
+        uart_send_text("\r\n");
+        line[length] = '\0';
+        handle_command(line);
+        length = 0;
+        user_typing = 0; /* command done: sample lines resume */
+      }
+    } else if (ch == 0x08 || ch == 0x7F) { /* backspace / delete */
+      if (length > 0) {
+        length--;
+        uart_send_text("\b \b");
+        if (length == 0) {
+          user_typing = 0; /* line erased: nothing left to protect */
+        }
+      }
+    } else if (ch >= 0x20 && ch <= 0x7E && length < CMD_LINE_MAX - 1U) {
+      user_typing = 1; /* pause sample lines before echoing the first key */
+      line[length++] = (char)ch;
+      uart_send((const char *)&ch, 1U);
     }
   }
 }
@@ -332,7 +541,8 @@ int main(void) {
 
   /* USER CODE BEGIN RTOS_MUTEX */
   i2cMutex = osMutexNew(&i2cMutex_attributes);
-  if (i2cMutex == NULL) {
+  uartMutex = osMutexNew(&uartMutex_attributes);
+  if (i2cMutex == NULL || uartMutex == NULL) {
     Error_Handler();
   }
   /* USER CODE END RTOS_MUTEX */
@@ -347,7 +557,8 @@ int main(void) {
 
   /* USER CODE BEGIN RTOS_QUEUES */
   sampleQueue = osMessageQueueNew(1U, sizeof(SensorSample), NULL);
-  if (sampleQueue == NULL) {
+  rxQueue = osMessageQueueNew(RX_QUEUE_LENGTH, sizeof(uint8_t), NULL);
+  if (sampleQueue == NULL || rxQueue == NULL) {
     Error_Handler();
   }
   /* USER CODE END RTOS_QUEUES */
@@ -358,7 +569,9 @@ int main(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   outputTaskHandle = osThreadNew(StartOutputTask, NULL, &outputTask_attributes);
-  if (outputTaskHandle == NULL) {
+  commandTaskHandle =
+      osThreadNew(StartCommandTask, NULL, &commandTask_attributes);
+  if (outputTaskHandle == NULL || commandTaskHandle == NULL) {
     Error_Handler();
   }
   /* USER CODE END RTOS_THREADS */
@@ -562,6 +775,12 @@ void StartDefaultTask(void *argument) {
 
     /* Overwrite, never block: the sensor must not wait on a slow output. */
     xQueueOverwrite((QueueHandle_t)sampleQueue, &sample);
+
+    /* Keep a copy for the "status" command. */
+    taskENTER_CRITICAL();
+    latest_sample = sample;
+    latest_valid = 1;
+    taskEXIT_CRITICAL();
 
     counter++; /* Counts attempts, including failed measurements. */
 
