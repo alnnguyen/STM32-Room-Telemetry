@@ -4,3 +4,6 @@ build_*/
 
 # macOS
 .DS_Store
+
+# Logged telemetry (tools/telemetry.py)
+data/

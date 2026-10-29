@@ -55,6 +55,17 @@ typedef struct {
 #define ALERT_OFF INT32_MAX  /* threshold value meaning "no alert set" */
 #define CMD_LINE_MAX 32U     /* longest command line, including the '\0' */
 #define RX_QUEUE_LENGTH 64U  /* typed bytes buffered between ISR and task */
+
+/* Watchdog: each task sets its bit at least this often... */
+#define WDG_SENSOR_ALIVE (1U << 0)
+#define WDG_OUTPUT_ALIVE (1U << 1)
+#define WDG_COMMAND_ALIVE (1U << 2)
+#define WDG_ALL_TASKS (WDG_SENSOR_ALIVE | WDG_OUTPUT_ALIVE | WDG_COMMAND_ALIVE)
+#define WDG_CHECKIN_MS 500U  /* how often idle tasks wake just to check in */
+/* ...and the watchdog task allows this long for all bits to appear. Must stay
+ * well under the hardware timeout (~5 s nominal, ~3.4 s worst case).
+ */
+#define WDG_WINDOW_MS 2000U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -137,6 +148,21 @@ static volatile int32_t alert_threshold_f100 = ALERT_OFF;
  */
 static volatile int user_typing = 0;
 
+/* Watchdog task: feeds the hardware watchdog only while every other task
+ * keeps checking in. Highest priority, so it is never starved by them.
+ */
+osThreadId_t watchdogTaskHandle;
+const osThreadAttr_t watchdogTask_attributes = {
+    .name = "watchdogTask",
+    .stack_size = 256 * 4,
+    .priority = (osPriority_t)osPriorityAboveNormal,
+};
+
+/* One bit per task (WDG_*_ALIVE). Tasks set their bit; the watchdog task
+ * waits for all of them and clears them each round.
+ */
+osEventFlagsId_t wdgFlags;
+
 /* Copy of the newest sample for the "status" command. The mailbox can't be
  * used for this: reading it would take the sample away from the output task.
  * Guarded by a critical section because it is larger than one word.
@@ -199,6 +225,8 @@ static HAL_StatusTypeDef recover_i2c1(void) {
 
 static void i2c_lock(void) { osMutexAcquire(i2cMutex, osWaitForever); }
 static void i2c_unlock(void) { osMutexRelease(i2cMutex); }
+
+static void wdg_checkin(uint32_t task_bit) { osEventFlagsSet(wdgFlags, task_bit); }
 
 static void report_sample(uint32_t counter, SHT31_Status status,
                           const SHT31_Reading *reading, int alert) {
@@ -309,7 +337,12 @@ static void StartOutputTask(void *argument) {
   SensorSample sample;
 
   for (;;) {
-    if (osMessageQueueGet(sampleQueue, &sample, NULL, osWaitForever) != osOK) {
+    /* Checking in here, with a timeout on the wait, means a stuck sensor
+     * task shows up as "sensor" in the watchdog report, not as both tasks.
+     */
+    wdg_checkin(WDG_OUTPUT_ALIVE);
+    if (osMessageQueueGet(sampleQueue, &sample, NULL, WDG_WINDOW_MS / 2U) !=
+        osOK) {
       continue;
     }
 
@@ -405,9 +438,17 @@ static void handle_command(char *line) {
     uart_send_text("Commands:\r\n"
                    "  status       latest reading and settings\r\n"
                    "  alert <F>    warn when temperature goes above <F>\r\n"
-                   "  alert off    disable the warning\r\n");
+                   "  alert off    disable the warning\r\n"
+                   "  hang         test: freeze this task; watchdog resets\r\n");
   } else if (strcmp(line, "status") == 0) {
     print_status();
+  } else if (strcmp(line, "hang") == 0) {
+    /* Watchdog test: this task stops checking in, as if it were deadlocked. */
+    uart_send_text("Simulating a stuck command task...\r\n");
+    user_typing = 0; /* let sample lines keep printing meanwhile */
+    for (;;) {
+      osDelay(1000U);
+    }
   } else if (strcmp(line, "alert off") == 0) {
     alert_threshold_f100 = ALERT_OFF;
     uart_send_text("Alert off\r\n");
@@ -440,7 +481,9 @@ static void StartCommandTask(void *argument) {
   uart_send_text("Type 'help' and press Enter for commands\r\n");
 
   for (;;) {
-    if (osMessageQueueGet(rxQueue, &ch, NULL, osWaitForever) != osOK) {
+    /* Wake at least every WDG_CHECKIN_MS even with no typing, to check in. */
+    wdg_checkin(WDG_COMMAND_ALIVE);
+    if (osMessageQueueGet(rxQueue, &ch, NULL, WDG_CHECKIN_MS) != osOK) {
       continue;
     }
 
@@ -464,6 +507,60 @@ static void StartCommandTask(void *argument) {
       user_typing = 1; /* pause sample lines before echoing the first key */
       line[length++] = (char)ch;
       uart_send((const char *)&ch, 1U);
+    }
+  }
+}
+
+/* ---- Watchdog ------------------------------------------------------------*/
+
+/* The independent watchdog (IWDG) is a hardware down-counter on its own
+ * ~32 kHz clock (LSI). If it reaches zero, the chip resets. Writing 0xAAAA
+ * to KR reloads it ("feeding"). Once started it cannot be stopped.
+ * Driven directly through its registers, since the HAL IWDG module is not
+ * enabled in this CubeMX project.
+ */
+static void iwdg_start(void) {
+  DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_IWDG_STOP; /* pause it at breakpoints */
+  IWDG->KR = 0xCCCCU; /* start the watchdog (also starts LSI) */
+  IWDG->KR = 0x5555U; /* unlock PR and RLR for writing */
+  IWDG->PR = 4U;      /* LSI / 64: one count every ~2 ms */
+  IWDG->RLR = 2500U;  /* ~5 s at 32 kHz; LSI tolerance gives ~3.4-9.4 s */
+  while (IWDG->SR != 0U) {
+    /* wait until the new prescaler/reload values are taken up */
+  }
+  IWDG->KR = 0xAAAAU; /* load the counter with RLR */
+}
+
+static void iwdg_feed(void) { IWDG->KR = 0xAAAAU; }
+
+static void StartWatchdogTask(void *argument) {
+  (void)argument;
+  iwdg_start();
+
+  for (;;) {
+    /* Wait for every task's bit. On success the bits are cleared, so each
+     * round needs a fresh check-in from every task.
+     */
+    uint32_t result = osEventFlagsWait(wdgFlags, WDG_ALL_TASKS, osFlagsWaitAll,
+                                       WDG_WINDOW_MS);
+    if ((result & osFlagsError) == 0U) {
+      iwdg_feed();
+      continue;
+    }
+
+    /* Someone missed the window: say who, then stop feeding. The hardware
+     * resets the board within a few seconds. (If the stuck task holds the
+     * UART lock, the message may not appear, but the reset still happens.)
+     */
+    uint32_t seen = osEventFlagsGet(wdgFlags);
+    char message[96] = "WATCHDOG: no check-in from";
+    if ((seen & WDG_SENSOR_ALIVE) == 0U) strcat(message, " sensor");
+    if ((seen & WDG_OUTPUT_ALIVE) == 0U) strcat(message, " output");
+    if ((seen & WDG_COMMAND_ALIVE) == 0U) strcat(message, " command");
+    strcat(message, "; resetting\r\n");
+    uart_send_text(message);
+    for (;;) {
+      osDelay(1000U);
     }
   }
 }
@@ -505,6 +602,12 @@ int main(void) {
 #ifdef SENSOR_TEST
   sensor_test_run(); // never returns; see sensor_test.c
 #endif
+
+  /* Report why we booted, so a watchdog reset is visible. */
+  if (__HAL_RCC_GET_FLAG(RCC_FLAG_IWDGRST)) {
+    uart_send_text("\r\n*** Reset by watchdog: a task stopped responding ***\r\n");
+  }
+  __HAL_RCC_CLEAR_RESET_FLAGS();
 
   HAL_Delay(2U); /* Allow sensor power-up before the first command. */
   if (recover_i2c1() != HAL_OK) {
@@ -558,7 +661,8 @@ int main(void) {
   /* USER CODE BEGIN RTOS_QUEUES */
   sampleQueue = osMessageQueueNew(1U, sizeof(SensorSample), NULL);
   rxQueue = osMessageQueueNew(RX_QUEUE_LENGTH, sizeof(uint8_t), NULL);
-  if (sampleQueue == NULL || rxQueue == NULL) {
+  wdgFlags = osEventFlagsNew(NULL);
+  if (sampleQueue == NULL || rxQueue == NULL || wdgFlags == NULL) {
     Error_Handler();
   }
   /* USER CODE END RTOS_QUEUES */
@@ -571,7 +675,10 @@ int main(void) {
   outputTaskHandle = osThreadNew(StartOutputTask, NULL, &outputTask_attributes);
   commandTaskHandle =
       osThreadNew(StartCommandTask, NULL, &commandTask_attributes);
-  if (outputTaskHandle == NULL || commandTaskHandle == NULL) {
+  watchdogTaskHandle =
+      osThreadNew(StartWatchdogTask, NULL, &watchdogTask_attributes);
+  if (outputTaskHandle == NULL || commandTaskHandle == NULL ||
+      watchdogTaskHandle == NULL) {
     Error_Handler();
   }
   /* USER CODE END RTOS_THREADS */
@@ -783,6 +890,7 @@ void StartDefaultTask(void *argument) {
     taskEXIT_CRITICAL();
 
     counter++; /* Counts attempts, including failed measurements. */
+    wdg_checkin(WDG_SENSOR_ALIVE);
 
     /* osDelayUntil wakes at fixed 1 s marks measured from the previous wake,
      * so time spent reading the sensor does not stretch the period.
